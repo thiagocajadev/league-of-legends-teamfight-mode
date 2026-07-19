@@ -5,6 +5,23 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.1.0] - 2026-07-19
+
+### Added
+
+- `bat/apply-hotkeys-en.bat`, espelho em inglês do script. Mesma engine PowerShell e mesmos exit codes do pt-BR, com as mensagens de menu traduzidas. Reverte a decisão anterior de manter só pt-BR.
+- Créditos embutidos nos dois `.bat`, com versão, `@thiagocajadev` e URL do repositório, visíveis no topo do arquivo e no cabeçalho do menu.
+- `.github/workflows/release.yml`, que dispara em push de tag `v*`, cria o release com os dois `.bat` anexados e apaga a release anterior. Usa o `gh` nativo do runner, sem action de terceiro.
+- Guard de versão no CI, que falha o workflow se o cabeçalho de versão dentro dos `.bat` não bater com a tag empurrada.
+
+### Changed
+
+- Os `.bat` passaram a viver em `bat/`, com sufixo de idioma no nome. A pasta não se chama `script` de propósito, já que o README nega explicitamente que o projeto seja script de jogo.
+- Links de download do README apontam para `releases/latest/download/`, que baixa o arquivo direto em um clique e não precisa ser reescrito a cada versão. Antes apontavam para o arquivo no repositório, que abre a página de código.
+- Seção de alcance de ataque reescrita nos dois READMEs. Ganhou resumo de uma linha antes da explicação, e a tabela de chaves passou a ser introduzida em linguagem não técnica.
+- Documentado que o `Espaço` já é a tecla de camera do jogo e que as duas primeiras chaves entram como tecla secundária. O texto anterior creditava a camera às chaves, que não a controlam.
+- Documentado o que acontece ao soltar o `Espaço`: o alvejar desliga junto, devolvendo o ataque livre para farmar.
+
 ## [1.0.0] - 2026-07-19
 
 ### Added
@@ -54,6 +71,7 @@ e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Os dois caminhos de edição, `input.ini` e `PersistedSettings.json`, com imagens de exemplo.
 - Seção de dicas finais, com a orientação de apagar os arquivos para o cliente recriá-los.
 
+[1.1.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/tag/v1.1.0
 [1.0.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/tag/v1.0.0
 [0.2.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/compare/d9883d9...86a2bb2
 [0.1.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/commits/d9883d9

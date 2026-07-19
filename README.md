@@ -23,7 +23,7 @@ Olá player de **Lolzinho**.
 
 Duas configurações do League of Legends não aparecem no menu de opções, e só mudam editando arquivo. A primeira desativa o zoom no scroll do mouse. A segunda junta três atalhos em um: exibir o alcance de ataque, fixar a camera no campeão e mirar só campeões, tudo com o `Espaço`.
 
-Este repositório traz as duas formas de aplicar. O passo a passo manual mostra o que muda e onde. O `apply-hotkeys.bat` faz a mesma edição sozinho, e guarda um backup antes de tocar em qualquer coisa.
+Este repositório traz as duas formas de aplicar. O passo a passo manual mostra o que muda e onde. O `.bat` faz a mesma edição sozinho, e guarda um backup antes de tocar em qualquer coisa.
 
 > [!IMPORTANT]
 > **Isto não é script de jogo.** No League, "script" quer dizer automatizar jogada, e isso é proibido e dá banimento.
@@ -64,12 +64,14 @@ Sem fechar e reabrir o modo treino, o jogo segue com os valores que carregou ant
 >
 > Por padrão fica em `C:\Riot Games\League of Legends\`. Se você mudou o caminho na instalação, ajuste onde aparecer.
 
-## Modo automático: `apply-hotkeys.bat`
+## Modo automático: o `.bat`
 
-Baixe o [`apply-hotkeys.bat`](apply-hotkeys.bat) e dê dois cliques. Ele abre um menu:
+**[⬇ Baixar apply-hotkeys-pt-br.bat](https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/latest/download/apply-hotkeys-pt-br.bat)** · [versão em inglês](https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/latest/download/apply-hotkeys-en.bat)
+
+Clique no link, salve o arquivo e dê dois cliques nele. Abre um menu:
 
 ```text
-  league-of-legends-hotkeys
+  league-of-legends-hotkeys  v1.1.0  @thiagocajadev
   ---------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
@@ -166,13 +168,13 @@ C:\Riot Games\League of Legends\Config
 
 ![Jinx tei-tei pow-pow](assets/img/jinx-compact.gif)
 
-A tecla `C` exibe o **alcance de ataque**. Saber o limite do campeão ajuda a decidir quando trocar dano e quando recuar, então vale combinar esse atalho com o de **fixar a camera**.
+Segure `Espaço` e tenha alcance, camera fixa e foco em campeões. Solte `Espaço` e volta tudo ao normal.
 
-Eu jogo com a tela solta, e quando preciso focar a camera no campeão mantenho o `Espaço` pressionado.
+### E como isso funciona
 
-### Por que são três chaves
+Por padrão, `C` mostra o **alcance de ataque** e `Espaço` **fixa a camera**. Saber o limite do campeão ajuda a decidir quando trocar dano e quando recuar, e eu jogo com a tela solta, então vale juntar os dois no mesmo gesto.
 
-As três precisam estar aplicadas juntas. Sozinha, nenhuma delas dá o resultado:
+O jogo guarda cada atalho como uma linha `nome=valor` no arquivo de configuração. O nome é o evento, o valor é a tecla que dispara. São três linhas, e `[space]` é o `Espaço`:
 
 | Chave | Valor | O que faz |
 | :-- | :-- | :-- |
@@ -180,9 +182,10 @@ As três precisam estar aplicadas juntas. Sozinha, nenhuma delas dá o resultado
 | `evtChampionOnly` | `[n],[space]` | Faz o ataque mirar só campeões, ignorando minions |
 | `TargetChampionsOnlyAsToggle` | `0` | Faz o alvejar valer enquanto a tecla estiver pressionada |
 
-As duas primeiras têm `[space]` no valor. Por isso o `Espaço` faz as três coisas ao mesmo tempo: mostra o alcance, fixa a camera e mira só campeões.
+Nenhuma das três mexe na camera: o `Espaço` já é a tecla dela, e as duas primeiras entram como tecla secundária. O resultado:
 
-A terceira controla como o alvejar funciona. Em `0`, ele fica ativo enquanto você segura a tecla. Em `1`, ele liga e desliga a cada toque, e aí para de acompanhar o `Espaço`.
+- **Segurar `Espaço`**: fixa a camera, alveja só campeões e mostra o alcance.
+- **Soltar**: volta ao padrão, camera solta, alvos gerais e sem alcance na tela.
 
 <details>
 <summary>Passo 1: editando o <code>input.ini</code></summary>

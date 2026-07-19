@@ -23,7 +23,7 @@ Hey there, League player.
 
 Two League of Legends settings never show up in the options menu, and the only way to change them is by editing a file. The first one disables zoom on the mouse scroll. The second one merges three shortcuts into one: show the attack range, lock the camera on your champion, and target champions only, all on `Space`.
 
-This repository covers both ways to apply them. The manual walkthrough shows what changes and where. The `apply-hotkeys.bat` makes the same edits on its own, and keeps a backup before touching anything.
+This repository covers both ways to apply them. The manual walkthrough shows what changes and where. The `.bat` makes the same edits on its own, and keeps a backup before touching anything.
 
 > [!IMPORTANT]
 > **This is not a game script.** In League, "script" means automating gameplay, which is against the rules and gets you banned.
@@ -64,22 +64,22 @@ Without closing and reopening Practice Tool, the game keeps the values it loaded
 >
 > The default is `C:\Riot Games\League of Legends\`. If you changed the path during installation, adjust it wherever it appears.
 
-## Automatic mode: `apply-hotkeys.bat`
+## Automatic mode: the `.bat`
 
-Download [`apply-hotkeys.bat`](apply-hotkeys.bat) and double click it. A menu opens:
+**[⬇ Download apply-hotkeys-en.bat](https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/latest/download/apply-hotkeys-en.bat)** · [Portuguese version](https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/latest/download/apply-hotkeys-pt-br.bat)
+
+Click the link, save the file and double click it. A menu opens:
 
 ```text
-  league-of-legends-hotkeys
+  league-of-legends-hotkeys  v1.1.0  @thiagocajadev
   ---------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
-  [1] Desabilitar zoom via scroll do mouse
-  [2] Alcance + fixar camera + alvejar campeoes (Espaco)
-  [3] Restaurar os arquivos originais (.bak)
-  [0] Sair
+  [1] Disable zoom via mouse scroll
+  [2] Attack range + lock camera + target champions (Space)
+  [3] Restore the original files (.bak)
+  [0] Exit
 ```
-
-The menu is in Portuguese. Here is what each option does:
 
 | Option | What it writes |
 | :-- | :-- |
@@ -168,13 +168,13 @@ C:\Riot Games\League of Legends\Config
 
 ![Jinx tei-tei pow-pow](assets/img/jinx-compact.gif)
 
-The `C` key shows the **attack range**. Knowing your champion's reach helps you decide when to trade damage and when to back off, so it pays to pair that shortcut with **camera lock**.
+Hold `Space` and get range, locked camera and champion focus. Release `Space` and everything goes back to normal.
 
-I play with the camera unlocked, and when I need it centered on my champion I hold `Space`.
+### And how it works
 
-### Why there are three keys
+By default, `C` shows the **attack range** and `Space` **locks the camera**. Knowing your champion's reach helps you decide when to trade damage and when to back off, and I play with the camera unlocked, so it pays to fold both into the same gesture.
 
-All three have to be applied together. On its own, none of them gives the result:
+The game stores every shortcut as a `name=value` line in the config file. The name is the event, the value is the key that fires it. There are three lines, and `[space]` is the `Space` key:
 
 | Key | Value | What it does |
 | :-- | :-- | :-- |
@@ -182,9 +182,10 @@ All three have to be applied together. On its own, none of them gives the result
 | `evtChampionOnly` | `[n],[space]` | Makes attacks target champions only, ignoring minions |
 | `TargetChampionsOnlyAsToggle` | `0` | Makes the targeting hold while the key is pressed |
 
-The first two carry `[space]` in the value. That is why `Space` does all three things at once: shows the range, locks the camera, and targets champions only.
+None of the three touches the camera: `Space` is already the camera key, and the first two come in as a secondary binding. The result:
 
-The third one controls how the targeting behaves. At `0`, it stays active while you hold the key. At `1`, it turns on and off with each press, and stops following `Space`.
+- **Hold `Space`**: locks the camera, targets champions only and shows the range.
+- **Release**: back to default, free camera, any target, no range on screen.
 
 <details>
 <summary>Step 1: editing <code>input.ini</code></summary>

@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # why: sem release anterior para recuar, publicar versao errada nao tem desfazer.
+      # O guard trava antes de criar qualquer coisa.
+      - name: Check version matches tag
+        run: |
+          for file in bat/*.bat; do
+            grep -qF ":: league-of-legends-hotkeys - $GITHUB_REF_NAME" "$file" \
+              || { echo "::error file=$file::version header does not match tag $GITHUB_REF_NAME"; exit 1; }
+          done
+
+      - name: Create release
+        run: gh release create "$GITHUB_REF_NAME" bat/*.bat --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # why: politica de manter so a ultima release. A tag fica, entao o commit
+      # daquela versao continua nomeado no historico.
+      - name: Prune previous releases
+        run: |
+          gh release list --json tagName --jq '.[].tagName' \
+            | grep -vxF "$GITHUB_REF_NAME" \
+            | xargs -r -I{} gh release delete {} --yes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,7 @@
 @echo off
+:: league-of-legends-hotkeys - v1.1.0
+:: @thiagocajadev
+:: github.com/thiagocajadev/league-of-legends-hotkeys
 setlocal EnableExtensions EnableDelayedExpansion
 title league-of-legends-hotkeys
 
@@ -6,7 +9,7 @@ set "SELF=%~f0"
 set "LOL_DIR="
 set "HOTKEY_ACTION=detect"
 
-echo Procurando a instalacao do League of Legends...
+echo Looking for the League of Legends installation...
 
 for /f "usebackq delims=" %%p in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$raw = Get-Content -LiteralPath $env:SELF -Raw; $engine = ($raw -split '#PS_ENGINE_START#')[-1]; Invoke-Expression -Command $engine"`) do set "LOL_DIR=%%p"
 
@@ -14,19 +17,19 @@ if not defined LOL_DIR set "LOL_DIR=C:\Riot Games\League of Legends"
 
 if not exist "%LOL_DIR%\Config" (
   echo.
-  echo Nao encontrei a instalacao do League of Legends.
-  echo Procurei no processo em execucao, no registro da Riot e em:
+  echo Could not find the League of Legends installation.
+  echo Checked the running process, the Riot metadata and:
   echo   %LOL_DIR%
   echo.
-  set /p "LOL_DIR=Informe a pasta de instalacao: "
+  set /p "LOL_DIR=Enter the installation folder: "
 )
 
 set "LOL_CONFIG_DIR=%LOL_DIR%\Config"
 
 if not exist "%LOL_CONFIG_DIR%" (
   echo.
-  echo ERRO: pasta de config inexistente: %LOL_CONFIG_DIR%
-  echo Nada foi alterado.
+  echo ERROR: config folder does not exist: %LOL_CONFIG_DIR%
+  echo Nothing was changed.
   echo.
   pause
   exit /b 1
@@ -35,17 +38,17 @@ if not exist "%LOL_CONFIG_DIR%" (
 :menu
 cls
 echo.
-echo   league-of-legends-hotkeys
+echo   league-of-legends-hotkeys  v1.1.0  @thiagocajadev
 echo   ---------------------------------------------
 echo   Config: %LOL_CONFIG_DIR%
 echo.
-echo   [1] Desabilitar zoom via scroll do mouse
-echo   [2] Alcance + fixar camera + alvejar campeoes (Espaco)
-echo   [3] Restaurar os arquivos originais (.bak)
-echo   [0] Sair
+echo   [1] Disable zoom via mouse scroll
+echo   [2] Attack range + lock camera + target champions (Space)
+echo   [3] Restore the original files (.bak)
+echo   [0] Exit
 echo.
 set "MENU_CHOICE="
-set /p "MENU_CHOICE=Escolha uma opcao: "
+set /p "MENU_CHOICE=Choose an option: "
 
 if "%MENU_CHOICE%"=="1" (
   set "HOTKEY_ACTION=zoom"
@@ -61,7 +64,7 @@ if "%MENU_CHOICE%"=="3" (
 )
 if "%MENU_CHOICE%"=="0" exit /b 0
 
-echo Opcao invalida.
+echo Invalid option.
 timeout /t 2 >nul
 goto menu
 
@@ -88,7 +91,7 @@ $action = $env:HOTKEY_ACTION
 # entao o nome do disco e o nome dentro do JSON sao declarados separados
 $hotkeyPresets = @{
   zoom = @{
-    Label    = 'Zoom via scroll desabilitado'
+    Label    = 'Zoom via mouse scroll disabled'
     Settings = @(
       @{
         IniFile       = 'input.ini'
@@ -103,7 +106,7 @@ $hotkeyPresets = @{
   # camera e alvo no mesmo gesto, e o AsToggle=0 faz valer enquanto segura.
   # Em 1 viraria liga/desliga e a combinacao quebra.
   range = @{
-    Label    = 'Alcance de ataque, fixar camera e alvejar campeoes'
+    Label    = 'Attack range, lock camera and target champions'
     Settings = @(
       @{
         IniFile       = 'input.ini'
@@ -225,7 +228,7 @@ function Backup-ConfigFile {
   }
 
   Copy-Item -LiteralPath $Path -Destination $backupPath
-  Write-Host "  backup criado: $(Split-Path $backupPath -Leaf)"
+  Write-Host "  backup created: $(Split-Path $backupPath -Leaf)"
 }
 
 function Set-IniSetting {
@@ -234,7 +237,7 @@ function Set-IniSetting {
   # why: arquivo ausente significa que o cliente nunca gravou config. Criar um do zero
   # produziria arquivo sem .bak, que a opcao 3 nao saberia desfazer
   if (-not (Test-Path -LiteralPath $Path)) {
-    Write-Host "  $(Split-Path $Path -Leaf) ausente, ignorado"
+    Write-Host "  $(Split-Path $Path -Leaf) missing, skipped"
     return
   }
 
@@ -322,7 +325,7 @@ function Set-PersistedSetting {
   param([string]$Path, [string]$FileName, [string]$Section, [string]$Key, [string]$Value)
 
   if (-not (Test-Path -LiteralPath $Path)) {
-    Write-Host "  PersistedSettings.json ausente, ignorado"
+    Write-Host "  PersistedSettings.json missing, skipped"
     return
   }
 
@@ -424,26 +427,26 @@ function Invoke-Preset {
 
   Write-Host ""
   Write-Host "OK - $($Preset.Label)"
-  Write-Host "Feche o modo treino e abra de novo para recarregar as configuracoes."
+  Write-Host "Close practice tool and open it again to reload the settings."
 }
 
 function Invoke-Restore {
   $backups = @(Get-ChildItem -LiteralPath $configDirectory -Filter '*.bak' -File -ErrorAction SilentlyContinue)
 
   if ($backups.Count -eq 0) {
-    Write-Host "Nenhum backup .bak encontrado em $configDirectory"
+    Write-Host "No .bak backup found in $configDirectory"
     exit 3
   }
 
   foreach ($backup in $backups) {
     $originalPath = $backup.FullName -replace '\.bak$', ''
     Copy-Item -LiteralPath $backup.FullName -Destination $originalPath -Force
-    Write-Host "  restaurado: $(Split-Path $originalPath -Leaf)"
+    Write-Host "  restored: $(Split-Path $originalPath -Leaf)"
   }
 
   Write-Host ""
-  Write-Host "OK - arquivos originais restaurados"
-  Write-Host "Feche o modo treino e abra de novo para recarregar as configuracoes."
+  Write-Host "OK - original files restored"
+  Write-Host "Close practice tool and open it again to reload the settings."
 }
 
 if ($action -eq 'detect') {
