@@ -1,170 +1,268 @@
-﻿# Configurações e ajustes em atalhos - LOL
+<div align="center">
+  <img src="assets/img/lol.png" alt="league-of-legends-hotkeys" width="480">
+  <h1 align="center">League Of Legends - Atalhos do Jogo</h1>
+  <p align="center">
+    Atalhos de teclado do League of Legends que o cliente não deixa configurar pela interface.<br>
+    O passo a passo para fazer na mão, e um <code>.bat</code> que faz por você.
+  </p>
+  <a href="https://learn.microsoft.com/windows/"><img src="https://img.shields.io/badge/windows-10%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Windows" /></a>
+  <a href="https://learn.microsoft.com/windows-server/administration/windows-commands/windows-commands"><img src="https://img.shields.io/badge/batch-cmd-4D4D4D?style=flat-square&logo=windowsterminal&logoColor=white" alt="Batch" /></a>
+  <a href="https://learn.microsoft.com/powershell/"><img src="https://img.shields.io/badge/powershell-5.1-5391FE?style=flat-square&logo=powershell&logoColor=white" alt="PowerShell" /></a>
+  <a href="https://www.leagueoflegends.com"><img src="https://img.shields.io/badge/league%20of%20legends-config-C89B3C?style=flat-square&logo=leagueoflegends&logoColor=white" alt="League of Legends" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="Licença MIT" /></a>
+  <p align="center">
+    <b>Português</b> · <a href="README.en.md">English</a>
+  </p>
+</div>
 
-![League](/assets/img/lol.png)
-*Créditos: [Epic games](https://store.epicgames.com/en-US/p/league-of-legends)*
+<br>
+
+*Créditos da imagem: [Epic Games](https://store.epicgames.com/en-US/p/league-of-legends)*
 
 Olá player de **Lolzinho**.
 
-Este guia explica como configurar o **RollerButtonSpeed**, desativando o zoom com o scroll do mouse. Acontece muito de esbarrar sem querer, reduzindo o campo de visão.
+Duas configurações do League of Legends não aparecem no menu de opções, e só mudam editando arquivo. A primeira desativa o zoom no scroll do mouse. A segunda junta três atalhos em um: exibir o alcance de ataque, fixar a camera no campeão e mirar só campeões, tudo com o `Espaço`.
 
-A outra configuração que pode ajudar na jogatina é para mapear um atalho duplo, exibindo o **alcance de ataque ao fixar a camera no campeão.**
+Este repositório traz as duas formas de aplicar. O passo a passo manual mostra o que muda e onde. O `apply-hotkeys.bat` faz a mesma edição sozinho, e guarda um backup antes de tocar em qualquer coisa.
 
-Vou deixar as duas formas de realizar a configuração por questões de compatibilidade futura: editando o arquivo `input.ini` ou o arquivo `PersistedSettings.json`.
+> [!IMPORTANT]
+> **Isto não é script de jogo.** No League, "script" quer dizer automatizar jogada, e isso é proibido e dá banimento.
+>
+> Aqui não tem nada disso. O que muda são dois arquivos de configuração, os mesmos que o cliente grava sozinho quando você mexe nas opções. Nada roda durante a partida, nada lê a memória do jogo, nada joga no seu lugar.
+>
+> O `.bat` escreve exatamente as linhas que você escreveria no Bloco de Notas. O passo a passo manual está logo abaixo, e serve para você conferir cada uma antes de rodar qualquer coisa.
+
+## Conceitos fundamentais
+
+| Conceito | O que é |
+| :-- | :-- |
+| `input.ini` | Arquivo de texto com os atalhos, em formato `chave=valor` agrupado por seção |
+| `PersistedSettings.json` | Espelho das configurações em JSON, que o cliente lê ao iniciar |
+| `RollerButtonSpeed` | Velocidade do zoom no scroll. Em `0`, o scroll para de dar zoom |
+| `evtShowCharacterMenu` | Evento do alcance de ataque. Aceita mais de uma tecla, separadas por vírgula |
+| `evtChampionOnly` | Evento que faz o ataque mirar só campeões, ignorando minions |
+| `TargetChampionsOnlyAsToggle` | Modo do alvejar. Em `0` vale enquanto segura, em `1` liga e desliga |
+| **modo treino** | Partida solo, sem adversários. Aqui serve para o cliente recarregar os arquivos |
+| `.bak` | Cópia do arquivo original, criada antes da primeira edição |
+
+## Antes de começar
+
+O cliente lê esses arquivos ao entrar em partida, e reescreve alguns deles ao fechar. Por isso a ordem importa:
+
+| Passo | Quem faz |
+| :-- | :-- |
+| 1. Abrir o jogo e entrar em **modo treino** | você |
+| 2. Minimizar o jogo, sem fechar | você |
+| 3. Editar `input.ini` e `PersistedSettings.json` | o `.bat`, ou você no Bloco de Notas |
+| 4. Fechar o modo treino e abrir de novo | você |
+| 5. Conferir o `C` + `Espaço` e o scroll | você |
+
+Sem fechar e reabrir o modo treino, o jogo segue com os valores que carregou antes da edição.
 
 > [!TIP]
->  Localize o Diretório de Instalação do League of Legends
+> Localize o diretório de instalação do League of Legends.
+>
+> Por padrão fica em `C:\Riot Games\League of Legends\`. Se você mudou o caminho na instalação, ajuste onde aparecer.
 
-Por padrão, o League of Legends é instalado em:
-```script
-C:\Riot Games\League of Legends\
+## Modo automático: `apply-hotkeys.bat`
+
+Baixe o [`apply-hotkeys.bat`](apply-hotkeys.bat) e dê dois cliques. Ele abre um menu:
+
+```text
+  league-of-legends-hotkeys
+  ---------------------------------------------
+  Config: C:\Riot Games\League of Legends\Config
+
+  [1] Desabilitar zoom via scroll do mouse
+  [2] Alcance + fixar camera + alvejar campeoes (Espaco)
+  [3] Restaurar os arquivos originais (.bak)
+  [0] Sair
 ```
 
-Se você alterou o diretório de instalação, ajuste o caminho conforme necessário.
+| Opção | O que escreve |
+| :-- | :-- |
+| `1` | `RollerButtonSpeed=0` no `input.ini` e no `PersistedSettings.json` |
+| `2` | As três chaves do alcance, camera e alvo, nos dois arquivos |
+| `3` | Devolve todo `.bak` da pasta `Config` ao lugar de origem |
 
-# Desativar Zoom via mouse scroll
+- **Backup automático.** Na primeira vez que você roda `1` ou `2`, cada arquivo tocado ganha um `.bak` ao lado. Rodar de novo não sobrescreve esse backup, senão a cópia "original" viraria cópia do arquivo já modificado.
+- **Substitui ou cria a chave.** Se a chave existe, o valor é trocado onde ela estiver. Se não existe, ela é criada na seção certa. Rodar duas vezes não duplica linha.
+- **Nunca cria arquivo.** Se o `input.ini` ou o `PersistedSettings.json` não existirem, o `.bat` avisa e pula aquele arquivo. Ele só mexe no que o cliente já gravou.
+- **Acha a instalação sozinho.** Com o jogo aberto, o `.bat` lê o caminho do processo em execução, então funciona com o League instalado em qualquer disco ou pasta. Se o jogo estiver fechado, ele tenta o registro da Riot, depois o caminho padrão, e só então pergunta.
 
-## Método 1: Editando o arquivo `input.ini`
+Se a pasta `Config` não existir, ele avisa e sai sem escrever nada.
+
+## Modo manual
+
+Pode editar manualmente, sem problemas. As duas configurações abaixo são o que o `.bat` faz, e chegam no mesmo resultado.
+
+## Desativar zoom via scroll do mouse
+
+No meio da luta o dedo esbarra no scroll sem querer. A camera dá zoom e você passa a enxergar menos do campo. Com o `RollerButtonSpeed` em `0`, o scroll para de mexer no zoom.
 
 <details>
-<summary>passo a passo...</summary>
+<summary>Passo 1: editando o <code>input.ini</code></summary>
 <br>
 
 1. Navegue até o diretório:
 
-```script
+```text
 C:\Riot Games\League of Legends\Config
 ```
 
-2. Abra o arquivo `input.ini` em um editor de texto, como o **Bloco de Notas**.
+2. Abra o `input.ini` em um editor de texto, como o **Bloco de Notas**.
 
 3. Adicione ou edite as seguintes linhas:
-```script
+
+```ini
 [MouseSettings]
 RollerButtonSpeed=0
 ```
 
-![Input.ini](/assets/img/01-exemplo-input-ini.png)  
+![Exemplo no input.ini](assets/img/01-exemplo-input-ini.png)
 *Exemplo no arquivo input.ini*
 
-4. Salve o arquivo e feche o editor de texto.
+4. Salve o arquivo e feche o editor.
+
 </details>
 
-## Método 2: Editando o arquivo `PersistedSettings.json`
-
 <details>
-<summary>passo a passo...</summary>
+<summary>Passo 2: editando o <code>PersistedSettings.json</code></summary>
 <br>
 
 1. Navegue até o diretório:
 
-  ```script
-  C:\Riot Games\League of Legends\Config
-  ```
-
-2. Abra o arquivo `PersistedSettings.json` em um editor de texto.
-
-3. Adicione ou edite o seguinte bloco de código no arquivo:
-```json
-{
-   "name": "MouseSettings",
-   "settings": [
-       {
-           "name": "RollerButtonSpeed",
-           "value": "0"
-       }
-   ]
-} 
-```
-
-![PersistedSettings.json](/assets/img/02-exemplo-persisted-settings.png)
-*Exemplo no arquivo PersistedSettings.json*
-
-> Certifique-se de manter a estrutura JSON válida. Não remova ou edite outras seções, a menos que saiba o que está fazendo.
-
-4. Salve o arquivo e feche o editor de texto.
-</details>
-
----
-
-# Exibir alcance de ataque
-
-![Jinx tei-tei pow-pow](assets/img/jinx-compact.gif)
-
-Quando você aperta tecla de atalho `C`, é exibido o **alcance de ataque**. Para ter a praticidade de jogar sabendo o limite do seu campeão, nada melhor do que combinar esse atalho com a função de **fixar a camera**.
-
-Eu jogo com a tela solta e quando preciso focar a camera no campeão, mantenho pressionada a tecla `Espaço`.
-
-## Método 1: Editando o arquivo `input.ini`
-
-<details>
-<summary>passo a passo...</summary>
-<br>
-
-1. Navegue até o diretório:
-
-```script
+```text
 C:\Riot Games\League of Legends\Config
 ```
 
-2. Abra o arquivo `input.ini` em um editor de texto, como o **Bloco de Notas**.
+2. Abra o `PersistedSettings.json` em um editor de texto.
 
-3. Adicione ou edite as seguintes linhas:
-```csharp
-evtShowCharacterMenu=[c],[space]
+3. Adicione ou edite o seguinte bloco:
+
+```json
+{
+  "name": "MouseSettings",
+  "settings": [
+    {
+      "name": "RollerButtonSpeed",
+      "value": "0"
+    }
+  ]
+}
 ```
 
-![Input.ini](/assets/img/03-exemplo-alcance-ataque-input-ini.png)  
-*Exemplo no arquivo input.ini*
+![Exemplo no PersistedSettings.json](assets/img/02-exemplo-persisted-settings.png)
+*Exemplo no arquivo PersistedSettings.json*
 
-4. Salve o arquivo e feche o editor de texto.
+> [!WARNING]
+> Mantenha a estrutura JSON válida. Não remova nem edite outras seções, a menos que saiba o que está fazendo.
+
+4. Salve o arquivo e feche o editor.
 
 </details>
 
+## Exibir alcance de ataque, fixar a camera e alvejar campeões
 
-## Método 2: Editando o arquivo `PersistedSettings.json`
+![Jinx tei-tei pow-pow](assets/img/jinx-compact.gif)
+
+A tecla `C` exibe o **alcance de ataque**. Saber o limite do campeão ajuda a decidir quando trocar dano e quando recuar, então vale combinar esse atalho com o de **fixar a camera**.
+
+Eu jogo com a tela solta, e quando preciso focar a camera no campeão mantenho o `Espaço` pressionado.
+
+### Por que são três chaves
+
+As três precisam estar aplicadas juntas. Sozinha, nenhuma delas dá o resultado:
+
+| Chave | Valor | O que faz |
+| :-- | :-- | :-- |
+| `evtShowCharacterMenu` | `[c],[space]` | Exibe o alcance de ataque |
+| `evtChampionOnly` | `[n],[space]` | Faz o ataque mirar só campeões, ignorando minions |
+| `TargetChampionsOnlyAsToggle` | `0` | Faz o alvejar valer enquanto a tecla estiver pressionada |
+
+As duas primeiras têm `[space]` no valor. Por isso o `Espaço` faz as três coisas ao mesmo tempo: mostra o alcance, fixa a camera e mira só campeões.
+
+A terceira controla como o alvejar funciona. Em `0`, ele fica ativo enquanto você segura a tecla. Em `1`, ele liga e desliga a cada toque, e aí para de acompanhar o `Espaço`.
 
 <details>
-<summary>passo a passo...</summary>
+<summary>Passo 1: editando o <code>input.ini</code></summary>
 <br>
 
 1. Navegue até o diretório:
 
-  ```script
-  C:\Riot Games\League of Legends\Config
-  ```
+```text
+C:\Riot Games\League of Legends\Config
+```
 
-2. Abra o arquivo `PersistedSettings.json` em um editor de texto.
+2. Abra o `input.ini` em um editor de texto.
 
-3. Adicione ou edite o seguinte bloco de código no arquivo:
+3. Na seção `[GameEvents]`, adicione ou edite as linhas:
 
-```js
-// Pesquise pela chave evtShowCharacterMenu dentro do arquivo PersistedSettings.json.
-// Adicione o atalho para fixar a camera e o alcance de ataque.
+```ini
+evtShowCharacterMenu=[c],[space]
+evtChampionOnly=[n],[space]
+TargetChampionsOnlyAsToggle=0
+```
+
+![Exemplo no input.ini](assets/img/03-exemplo-alcance-ataque-input-ini.png)
+*Exemplo no arquivo input.ini*
+
+4. Salve o arquivo e feche o editor.
+
+</details>
+
+<details>
+<summary>Passo 2: editando o <code>PersistedSettings.json</code></summary>
+<br>
+
+1. Navegue até o diretório:
+
+```text
+C:\Riot Games\League of Legends\Config
+```
+
+2. Abra o `PersistedSettings.json` em um editor de texto.
+
+3. Procure uma chave de cada vez com o buscar do editor (`Ctrl+F`) e deixe os valores assim. Elas ficam espalhadas pelo arquivo, então não espere achar as três em sequência:
+
+```json
+{
+    "name": "TargetChampionsOnlyAsToggle",
+    "value": "0"
+},
+{
+    "name": "evtChampionOnly",
+    "value": "[n],[space]"
+},
 {
     "name": "evtShowCharacterMenu",
     "value": "[c],[space]"
 },
 ```
 
-![PersistedSettings.json](/assets/img/04-exemplo-alcance-ataque-persisted-settings.png)
+![Exemplo no PersistedSettings.json](assets/img/04-exemplo-alcance-ataque-persisted-settings.png)
 *Exemplo no arquivo PersistedSettings.json*
 
-> Certifique-se de manter a estrutura JSON válida. Não remova ou edite outras seções, a menos que saiba o que está fazendo.
+> [!WARNING]
+> Mantenha a estrutura JSON válida. Não remova nem edite outras seções, a menos que saiba o que está fazendo.
 
-4. Salve o arquivo e feche o editor de texto.
+4. Salve o arquivo e feche o editor.
+
 </details>
 
-## Dicas Finais
+## Dicas finais
 
-- Após realizar qualquer uma das configurações, reinicie o cliente do League of Legends para que as alterações sejam
-  aplicadas.
-
-- Caso algo dê errado, você pode excluir os arquivos `input.ini` e/ou `PersistedSettings.json`, pois o cliente recriará
-  versões padrão desses arquivos ao iniciar.
+- Depois de qualquer configuração, feche e reabra o modo treino para o cliente recarregar os arquivos.
+- Se algo der errado, rode a opção `3` do `.bat`, que devolve os originais.
+- Se você não tiver backup, apague o `input.ini` e o `PersistedSettings.json`. O cliente recria os dois com os valores padrão ao iniciar.
 
 ## Referências
 
-- [YouTube - Tutorial pra desativar scroll](https://www.youtube.com/watch?v=db7sTv3zYAg)
-- [YouTube - Tutorial para sempre exibir o alcance de ataque](https://www.youtube.com/watch?v=hTs4veZcbo8)
-- [Reddit - Conversa sobre desativar o scroll](https://www.reddit.com/r/leagueoflegends/comments/tvib4a/disable_zooming_inout_with_mouse_scroll_wheel/?rdt=56391)
-- [Reddit - Exibir alcance do ataque](https://www.reddit.com/r/ADCMains/comments/1ejlzg5/comment/lgh39ku/?tl=pt-br&utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+- [YouTube: tutorial para desativar o scroll](https://www.youtube.com/watch?v=db7sTv3zYAg)
+- [YouTube: tutorial para sempre exibir o alcance de ataque](https://www.youtube.com/watch?v=hTs4veZcbo8)
+- [Reddit: conversa sobre desativar o scroll](https://www.reddit.com/r/leagueoflegends/comments/tvib4a/disable_zooming_inout_with_mouse_scroll_wheel/?rdt=56391)
+- [Reddit: exibir alcance do ataque](https://www.reddit.com/r/ADCMains/comments/1ejlzg5/comment/lgh39ku/?tl=pt-br)
+
+## Licença
+
+MIT, thiagocajadev.

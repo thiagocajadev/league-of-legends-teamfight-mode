@@ -1,0 +1,10 @@
+
+# Environment — never commit secrets
+.env
+.env.*
+
+# AI artifacts — session state, not project logic
+.ai/
+CLAUDE.md
+tmp/
+temp/
