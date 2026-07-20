@@ -5,6 +5,21 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.1.0] - 2026-07-20
+
+### Added
+
+- **Câmera solta entrou no Modo Teamfight**, com as duas chaves que faltavam para o combo funcionar: `evtCameraSnap=[space]` no `input.ini` e `CameraMode=0` no `PersistedSettings.json`. Sem elas a câmera já ficava travada e o `Espaço` não tinha o que fixar, então o gesto inteiro perdia efeito.
+- Seção sobre câmera solta nos dois READMEs: entrada na tabela de conceitos, bloco próprio nos detalhes, passo manual e um callout explicando quando soltar a câmera pelo mapa e quando travar na luta.
+- `Write-IniTarget` e `Write-PersistedTarget` na engine PowerShell, que tornam os destinos opcionais. Cada chave declara em qual arquivo mora, e o destino não declarado é pulado. As duas chaves novas são as primeiras que vivem num arquivo só.
+
+### Changed
+
+- Aviso sobre voltar ao padrão virou callout `[!WARNING]`. O texto também parou de tratar o caminho `1` como gratuito: restaurar o `.bak` devolve o arquivo ao estado de antes da primeira execução, então ajustes feitos depois disso se perdem junto.
+- Grafia de "câmera" corrigida nos 19 pontos do `README.md` fora de bloco de código. O menu reproduzido do `.bat` segue sem acento, porque o `cmd.exe` abre em code page 850 ou 437 e acento vira mojibake.
+- Contagem de configurações saiu dos dois READMEs. O texto passou a dizer "as configurações", sem número, então incluir um novo grupo não obriga a varrer o arquivo atrás de "duas" e "três".
+- Imagens dos dois READMEs ganharam respiro embaixo, com `<br>`. Atributo `style` não sobrevive ao sanitizador do GitHub.
+
 ## [2.0.3] - 2026-07-20
 
 ### Fixed

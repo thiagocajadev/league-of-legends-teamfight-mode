@@ -20,9 +20,9 @@
 
 Olá player de **Lolzinho**.
 
-Duas configurações do League of Legends não aparecem no menu de opções, e só mudam editando arquivo. Juntas elas formam o que aqui chamamos de **Modo Teamfight**: o scroll do mouse para de dar zoom sem você pedir, e o `Espaço` passa a exibir o alcance de ataque, fixar a camera no campeão e mirar só campeões, tudo no mesmo gesto.
+As configurações do League of Legends que não aparecem no menu de opções só mudam editando arquivo. Juntas elas formam o que aqui chamamos de **Modo Teamfight**: o scroll do mouse para de dar zoom sem você pedir, e o `Espaço` passa a exibir o alcance de ataque, fixar a câmera no campeão e mirar só campeões, tudo no mesmo gesto.
 
-Menos camera girando por engano no meio da briga, e mais informação na tela na hora de decidir se troca dano ou recua.
+Menos câmera girando por engano no meio da briga, e mais informação na tela na hora de decidir se troca dano ou recua.
 
 Este repositório traz as duas formas de aplicar. O `.bat` faz tudo de uma vez e guarda um backup antes de tocar em qualquer coisa. O passo a passo manual mostra exatamente o que muda e onde, para quem prefere conferir cada linha.
 
@@ -37,9 +37,11 @@ Este repositório traz as duas formas de aplicar. O `.bat` faz tudo de uma vez e
 
 <img src="assets/img/jinx-compact.gif" alt="Jinx tei-tei pow-pow" width="384">
 
-**Aperta `Espaço`, modo luta.** Alcance de ataque na tela, camera fixa no campeão e ataque mirando só campeões.
+<br>
 
-**Solta `Espaço`, modo normal.** Camera solta, alvos gerais e sem alcance na tela.
+**Aperta `Espaço`, modo luta.** Alcance de ataque na tela, câmera fixa no campeão e ataque mirando só campeões.
+
+**Solta `Espaço`, modo normal.** Câmera solta, alvos gerais e sem alcance na tela.
 
 E o scroll do mouse para de dar zoom, o tempo todo.
 
@@ -47,11 +49,16 @@ E o scroll do mouse para de dar zoom, o tempo todo.
 <summary><b>Os detalhes do Modo Teamfight</b></summary>
 <br>
 
-**Zoom travado no scroll.** No meio da luta o dedo esbarra no scroll sem querer. A camera dá zoom e você passa a enxergar menos do campo. Com o `RollerButtonSpeed` em `0`, o scroll para de mexer no zoom. Diferente das outras três chaves, essa não depende do `Espaço`.
+**Zoom travado no scroll.** No meio da luta você esbarra no scroll sem querer. A câmera dá zoom e diminui a visão do campo. Com o `RollerButtonSpeed` em `0`, o scroll para de mexer no zoom. Diferente das outras chaves, essa não depende do `Espaço`.
 
-**Alcance, camera e alvo no `Espaço`.** Por padrão, `C` mostra o alcance de ataque e `Espaço` fixa a camera. Saber o limite do campeão ajuda a decidir quando trocar dano e quando recuar, e eu jogo com a tela solta, então vale juntar os dois no mesmo gesto.
+**Câmera solta como base.** O combo inteiro parte da câmera solta, aquela que você arrasta pelo mapa em vez de andar colada no campeão. Se a câmera já estiver travada, o `Espaço` não tem o que fixar e o gesto perde a função. São duas chaves que garantem isso:
 
-O jogo guarda cada atalho como uma linha `nome=valor` no arquivo de configuração. O nome é o evento, o valor é a tecla que dispara. São três linhas, e `[space]` é o `Espaço`:
+| Chave | Valor | O que faz |
+| :-- | :-- | :-- |
+| `CameraMode` | `0` | Deixa a câmera solta por padrão, sem seguir o campeão |
+| `evtCameraSnap` | `[space]` | Define o `Espaço` como a tecla que fixa a câmera no campeão |
+
+**Alcance e alvo no mesmo `Espaço`.** Por padrão, `C` mostra o alcance de ataque. Saber o limite do campeão ajuda a decidir quando trocar dano e quando recuar.
 
 | Chave | Valor | O que faz |
 | :-- | :-- | :-- |
@@ -59,7 +66,12 @@ O jogo guarda cada atalho como uma linha `nome=valor` no arquivo de configuraç�
 | `evtChampionOnly` | `[n],[space]` | Faz o ataque mirar só campeões, ignorando minions |
 | `TargetChampionsOnlyAsToggle` | `0` | Faz o alvejar valer enquanto a tecla estiver pressionada |
 
-Nenhuma das três mexe na camera: o `Espaço` já é a tecla dela, e as duas primeiras entram como tecla secundária. O `TargetChampionsOnlyAsToggle=0` faz o efeito valer enquanto você segura, em vez de virar liga e desliga.
+As duas primeiras entram como tecla secundária, sem tirar o `C` e o `N` de quem já usa. O `TargetChampionsOnlyAsToggle=0` faz o efeito valer enquanto você pressiona a tecla, em vez de virar liga e desliga.
+
+> [!TIP]
+> **Vale se acostumar com a câmera solta.** Ela te dá visão do mapa sem trocar de tela: você acompanha uma rotação inimiga, confere o objetivo, decide se vai. Travada, você enxerga só o próprio campeão.
+>
+> Em compensação, você precisa arrastar a câmera de volta quando a luta começa. O `Espaço` resolve isso: enquanto você segura, a câmera fica fixa no campeão.
 
 </details>
 
@@ -72,6 +84,9 @@ Nenhuma das três mexe na camera: o `Espaço` já é a tecla dela, e as duas pri
 | `input.ini` | Arquivo de texto com os atalhos, em formato `chave=valor` agrupado por seção |
 | `PersistedSettings.json` | Espelho das configurações em JSON, que o cliente lê ao iniciar |
 | `RollerButtonSpeed` | Velocidade do zoom no scroll. Em `0`, o scroll para de dar zoom |
+| **câmera solta** | Modo em que a câmera não segue o campeão, e você a move pelo mapa |
+| `CameraMode` | Modo inicial da câmera. Em `0` ela fica solta, em `1` fica travada |
+| `evtCameraSnap` | Evento que fixa a câmera no campeão enquanto a tecla estiver pressionada |
 | `evtShowCharacterMenu` | Evento do alcance de ataque. Aceita mais de uma tecla, separadas por vírgula |
 | `evtChampionOnly` | Evento que faz o ataque mirar só campeões, ignorando minions |
 | `TargetChampionsOnlyAsToggle` | Modo do alvejar. Em `0` vale enquanto segura, em `1` liga e desliga |
@@ -104,7 +119,7 @@ Sem fechar e reabrir o modo treino, o jogo segue com os valores que carregou ant
 
 **[⬇ Baixar aplica-modo-teamfight.bat](https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/latest/download/aplica-modo-teamfight.bat)** · [versão em inglês](https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/latest/download/apply-teamfight-mode.bat)
 
-Clique no link, salve o arquivo e dê dois cliques nele. A opção `1`, **Aplicar o Modo Teamfight**, escreve as duas configurações de uma vez.
+Clique no link, salve o arquivo e dê dois cliques nele. A opção `1`, **Aplicar o Modo Teamfight**, escreve as configurações de uma vez.
 
 <details>
 <summary><b>Como o <code>.bat</code> funciona</b></summary>
@@ -113,7 +128,7 @@ Clique no link, salve o arquivo e dê dois cliques nele. A opção `1`, **Aplica
 Abre um menu:
 
 ```text
-  league-of-legends-teamfight-mode  v2.0.3  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
@@ -127,10 +142,10 @@ Abre um menu:
 
 | Opção | O que escreve |
 | :-- | :-- |
-| `1` | `RollerButtonSpeed=0` e as três chaves de alcance, camera e alvo, nos dois arquivos |
+| `1` | `RollerButtonSpeed=0`, as duas chaves de câmera solta e as três de alcance e alvo |
 | `2` | Devolve todo `.bak` da pasta `Config` ao lugar de origem |
 
-- **Um passo só, de propósito.** As duas configurações são aplicadas na mesma execução. Assim todo `.bak` é sempre a cópia anterior a qualquer alteração, e não existe estado intermediário para você decifrar se resolver voltar atrás.
+- **Um passo só, de propósito.** As configurações são aplicadas na mesma execução. Assim todo `.bak` é sempre a cópia anterior a qualquer alteração, e não existe estado intermediário para você decifrar se resolver voltar atrás.
 - **Backup automático.** Na primeira vez que você roda `1`, cada arquivo tocado ganha um `.bak` ao lado. Rodar de novo não sobrescreve esse backup, senão a cópia "original" viraria cópia do arquivo já modificado.
 - **Substitui ou cria a chave.** Se a chave existe, o valor é trocado onde ela estiver. Se não existe, ela é criada na seção certa. Rodar duas vezes não duplica linha.
 - **Nunca cria arquivo.** Se o `input.ini` ou o `PersistedSettings.json` não existirem, o `.bat` avisa e pula aquele arquivo. Ele só mexe no que o cliente já gravou.
@@ -144,7 +159,7 @@ Se a pasta `Config` não existir, ele avisa e sai sem escrever nada.
 <summary><b>Modo manual: alterando arquivos com Bloco de Notas</b></summary>
 <br>
 
-Pode editar manualmente, sem problemas. As duas configurações abaixo são o que o `.bat` faz, e chegam no mesmo resultado.
+Pode editar manualmente, sem problemas. As configurações abaixo são o que o `.bat` faz, e chegam no mesmo resultado.
 
 Todos os arquivos ficam em:
 
@@ -168,6 +183,8 @@ RollerButtonSpeed=0
 
 *Exemplo no arquivo input.ini*
 
+<br>
+
 Depois abra o `PersistedSettings.json` e adicione ou edite o bloco:
 
 ```json
@@ -186,7 +203,35 @@ Depois abra o `PersistedSettings.json` e adicione ou edite o bloco:
 
 *Exemplo no arquivo PersistedSettings.json*
 
-### Alcance, camera e alvo no Espaço
+<br>
+
+### Câmera solta com trava no Espaço
+
+Estas duas chaves são a exceção: cada uma vive em um arquivo só, sem par no outro.
+
+No `input.ini`, na seção `[GameEvents]`, adicione ou edite a linha:
+
+```ini
+evtCameraSnap=[space]
+```
+
+No `PersistedSettings.json`, procure a seção `General` e deixe o `CameraMode` assim:
+
+```json
+{
+    "name": "General",
+    "settings": [
+        {
+            "name": "CameraMode",
+            "value": "0"
+        }
+    ]
+}
+```
+
+Se o `CameraMode` já existir no arquivo, troque só o valor onde ele está, sem criar um segundo.
+
+### Alcance e alvo no Espaço
 
 No `input.ini`, na seção `[GameEvents]`, adicione ou edite as linhas:
 
@@ -199,6 +244,8 @@ TargetChampionsOnlyAsToggle=0
 ![Exemplo no input.ini](assets/img/03-exemplo-alcance-ataque-input-ini.png)
 
 *Exemplo no arquivo input.ini*
+
+<br>
 
 No `PersistedSettings.json`, procure uma chave de cada vez com o buscar do editor (`Ctrl+F`) e deixe os valores assim. Elas ficam espalhadas pelo arquivo, então não espere achar as três em sequência:
 
@@ -221,6 +268,8 @@ No `PersistedSettings.json`, procure uma chave de cada vez com o buscar do edito
 
 *Exemplo no arquivo PersistedSettings.json*
 
+<br>
+
 Salve os dois arquivos e feche o editor.
 
 </details>
@@ -238,7 +287,10 @@ Três caminhos, do mais seguro ao mais bruto:
 2. **Apagar os arquivos gerados.** Sem backup à mão, apague o `input.ini` e o `PersistedSettings.json` da pasta `Config`. O cliente do LoL recria os dois com os valores padrão ao iniciar.
 3. **Restaurar pelo próprio jogo.** Dentro do League, em **Configurações**, existe a opção de restaurar as configurações padrão. Serve para desfazer tudo sem tocar em arquivo nenhum.
 
-Os caminhos `2` e `3` zeram também as outras opções que você tenha ajustado no jogo, não só o Modo Teamfight.
+> [!WARNING]
+> Os caminhos `2` e `3` zeram também as outras opções que você tenha ajustado no jogo, não só o Modo Teamfight.
+>
+> O caminho `1` é o mais contido: devolve os arquivos ao estado exato de antes da primeira execução. Ajustes que você fez depois disso também se perdem.
 
 ## Referências
 
