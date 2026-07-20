@@ -20,7 +20,7 @@
 
 Hey there, League player.
 
-Two League of Legends settings never show up in the options menu, and the only way to change them is by editing a file. Together they make what we call **Teamfight Mode** here: the mouse scroll stops zooming when you did not ask for it, and `Space` starts showing the attack range, locking the camera on your champion and targeting champions only, all in the same gesture.
+The League of Legends settings that never show up in the options menu only change by editing a file. Together they make what we call **Teamfight Mode** here: the mouse scroll stops zooming when you did not ask for it, and `Space` starts showing the attack range, locking the camera on your champion and targeting champions only, all in the same gesture.
 
 Less camera swinging by accident mid fight, and more information on screen when you decide whether to trade damage or back off.
 
@@ -37,6 +37,8 @@ This repository covers both ways to apply it. The `.bat` does everything at once
 
 <img src="assets/img/jinx-compact.gif" alt="Jinx tei-tei pow-pow" width="384">
 
+<br>
+
 **Press `Space`, teamfight mode.** Attack range on screen, camera locked on your champion and attacks targeting champions only.
 
 **Release `Space`, normal mode.** Free camera, any target and no range on screen.
@@ -47,11 +49,16 @@ And the mouse scroll stops zooming, the whole match.
 <summary><b>The Teamfight Mode details</b></summary>
 <br>
 
-**Scroll zoom locked.** In the middle of a fight your finger bumps the scroll wheel. The camera zooms and you end up seeing less of the field. With `RollerButtonSpeed` at `0`, the scroll wheel stops changing the zoom. Unlike the other three keys, this one does not depend on `Space`.
+**Scroll zoom locked.** In the middle of a fight you bump the scroll wheel. The camera zooms and you see less of the field. With `RollerButtonSpeed` at `0`, the scroll wheel stops changing the zoom. Unlike the other keys, this one does not depend on `Space`.
 
-**Range, camera and target on `Space`.** By default, `C` shows the attack range and `Space` locks the camera. Knowing your champion's reach helps you decide when to trade damage and when to back off, and I play with the camera unlocked, so it pays to fold both into the same gesture.
+**Unlocked camera as the base.** The whole combo starts from an unlocked camera, the one you drag across the map instead of having it glued to your champion. If the camera is already locked, `Space` has nothing to lock and the gesture loses its purpose. Two keys make sure of that:
 
-The game stores every shortcut as a `name=value` line in the config file. The name is the event, the value is the key that fires it. There are three lines, and `[space]` is the `Space` key:
+| Key | Value | What it does |
+| :-- | :-- | :-- |
+| `CameraMode` | `0` | Leaves the camera unlocked by default, not following your champion |
+| `evtCameraSnap` | `[space]` | Sets `Space` as the key that locks the camera on your champion |
+
+**Range and target on the same `Space`.** By default, `C` shows the attack range. Knowing your champion's reach helps you decide when to trade damage and when to back off.
 
 | Key | Value | What it does |
 | :-- | :-- | :-- |
@@ -59,7 +66,12 @@ The game stores every shortcut as a `name=value` line in the config file. The na
 | `evtChampionOnly` | `[n],[space]` | Makes attacks target champions only, ignoring minions |
 | `TargetChampionsOnlyAsToggle` | `0` | Makes the targeting hold while the key is pressed |
 
-None of the three touches the camera: `Space` is already the camera key, and the first two come in as a secondary binding. The `TargetChampionsOnlyAsToggle=0` makes the effect hold while you press, instead of turning into an on and off switch.
+The first two come in as a secondary binding, so `C` and `N` keep working for anyone already used to them. The `TargetChampionsOnlyAsToggle=0` makes the effect hold while you press the key, instead of turning into an on and off switch.
+
+> [!TIP]
+> **The unlocked camera is worth getting used to.** It gives you map vision without switching screens: you follow an enemy rotation, check the objective, decide whether to go. Locked, you only see your own champion.
+>
+> In exchange, you have to drag the camera back when the fight starts. `Space` covers that: while you hold it, the camera stays locked on your champion.
 
 </details>
 
@@ -72,6 +84,9 @@ None of the three touches the camera: `Space` is already the camera key, and the
 | `input.ini` | Text file holding the keybinds, as `key=value` grouped into sections |
 | `PersistedSettings.json` | JSON mirror of the settings, which the client reads on startup |
 | `RollerButtonSpeed` | Scroll zoom speed. At `0`, the scroll wheel stops zooming |
+| **unlocked camera** | Mode where the camera does not follow your champion, and you move it across the map |
+| `CameraMode` | Starting camera mode. At `0` it stays unlocked, at `1` it stays locked |
+| `evtCameraSnap` | Event that locks the camera on your champion while the key is held |
 | `evtShowCharacterMenu` | Attack range event. Takes more than one key, separated by a comma |
 | `evtChampionOnly` | Event that makes attacks target champions only, ignoring minions |
 | `TargetChampionsOnlyAsToggle` | Targeting mode. At `0` it holds, at `1` it toggles on and off |
@@ -104,7 +119,7 @@ Without closing and reopening Practice Tool, the game keeps the values it loaded
 
 **[⬇ Download apply-teamfight-mode.bat](https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/latest/download/apply-teamfight-mode.bat)** · [Portuguese version](https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/latest/download/aplica-modo-teamfight.bat)
 
-Click the link, save the file and double click it. Option `1`, **Apply Teamfight Mode**, writes both settings at once.
+Click the link, save the file and double click it. Option `1`, **Apply Teamfight Mode**, writes the settings at once.
 
 <details>
 <summary><b>How the <code>.bat</code> works</b></summary>
@@ -113,7 +128,7 @@ Click the link, save the file and double click it. Option `1`, **Apply Teamfight
 A menu opens:
 
 ```text
-  league-of-legends-teamfight-mode  v2.0.3  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
@@ -127,10 +142,10 @@ A menu opens:
 
 | Option | What it writes |
 | :-- | :-- |
-| `1` | `RollerButtonSpeed=0` plus the three keys for range, camera and targeting, in both files |
+| `1` | `RollerButtonSpeed=0`, the two unlocked camera keys and the three for range and targeting |
 | `2` | Restores every `.bak` in the `Config` folder back to its original name |
 
-- **One step, on purpose.** Both settings are applied in the same run. That way every `.bak` is always the copy from before any change, and there is no in-between state for you to decode if you decide to roll back.
+- **One step, on purpose.** The settings are applied in the same run. That way every `.bak` is always the copy from before any change, and there is no in-between state for you to decode if you decide to roll back.
 - **Automatic backup.** The first time you run `1`, every file it touches gets a `.bak` next to it. Running again does not overwrite that backup, otherwise the "original" copy would become a copy of the already modified file.
 - **Replaces or creates the key.** If the key exists, the value is replaced wherever it sits. If it does not exist, it is created in the right section. Running twice does not duplicate a line.
 - **Never creates a file.** If `input.ini` or `PersistedSettings.json` are missing, the `.bat` says so and skips that file. It only touches what the client already wrote.
@@ -144,7 +159,7 @@ If the `Config` folder does not exist, it says so and exits without writing anyt
 <summary><b>Manual mode: changing files with Notepad</b></summary>
 <br>
 
-Editing by hand is fine. The two configurations below are what the `.bat` does, and they reach the same result.
+Editing by hand is fine. The configurations below are what the `.bat` does, and they reach the same result.
 
 Every file lives in:
 
@@ -152,8 +167,7 @@ Every file lives in:
 C:\Riot Games\League of Legends\Config
 ```
 
-> [!WARNING]
-> Keep the JSON structure valid. Do not remove or edit other sections unless you know what you are doing.
+**Note:** keep the JSON structure valid. Do not remove or edit other sections unless you know what you are doing.
 
 ### Disable zoom on mouse scroll
 
@@ -167,6 +181,8 @@ RollerButtonSpeed=0
 ![Example in input.ini](assets/img/01-exemplo-input-ini.png)
 
 *Example inside input.ini*
+
+<br>
 
 Then open `PersistedSettings.json` and add or edit this block:
 
@@ -186,7 +202,35 @@ Then open `PersistedSettings.json` and add or edit this block:
 
 *Example inside PersistedSettings.json*
 
-### Range, camera and target on Space
+<br>
+
+### Unlocked camera with lock on Space
+
+These two keys are the exception: each one lives in a single file, with no counterpart in the other.
+
+In `input.ini`, under the `[GameEvents]` section, add or edit this line:
+
+```ini
+evtCameraSnap=[space]
+```
+
+In `PersistedSettings.json`, find the `General` section and set `CameraMode` like this:
+
+```json
+{
+    "name": "General",
+    "settings": [
+        {
+            "name": "CameraMode",
+            "value": "0"
+        }
+    ]
+}
+```
+
+If `CameraMode` already exists in the file, change only the value where it sits, without creating a second one.
+
+### Range and target on Space
 
 In `input.ini`, under the `[GameEvents]` section, add or edit these lines:
 
@@ -199,6 +243,8 @@ TargetChampionsOnlyAsToggle=0
 ![Example in input.ini](assets/img/03-exemplo-alcance-ataque-input-ini.png)
 
 *Example inside input.ini*
+
+<br>
 
 In `PersistedSettings.json`, search for one key at a time with the editor's find box (`Ctrl+F`) and set the values like this. They sit far apart in the file, so do not expect to find the three in sequence:
 
@@ -221,6 +267,8 @@ In `PersistedSettings.json`, search for one key at a time with the editor's find
 
 *Example inside PersistedSettings.json*
 
+<br>
+
 Save both files and close the editor.
 
 </details>
@@ -238,7 +286,10 @@ Three ways, from the safest to the bluntest:
 2. **Delete the generated files.** With no backup at hand, delete `input.ini` and `PersistedSettings.json` from the `Config` folder. The LoL client recreates both with default values on startup.
 3. **Restore from the game itself.** Inside League, under **Settings**, there is an option to restore the default settings. It undoes everything without touching a single file.
 
-Ways `2` and `3` also wipe any other option you have tuned in the game, not only Teamfight Mode.
+> [!WARNING]
+> Ways `2` and `3` also wipe any other option you have tuned in the game, not only Teamfight Mode.
+>
+> Way `1` is the most contained: it puts the files back to the exact state from before the first run. Anything you tuned after that is lost too.
 
 ## References
 

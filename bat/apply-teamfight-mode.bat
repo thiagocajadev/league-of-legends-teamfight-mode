@@ -1,5 +1,5 @@
 @echo off
-:: league-of-legends-teamfight-mode - v2.0.3
+:: league-of-legends-teamfight-mode - v2.1.0
 :: @thiagocajadev
 :: github.com/thiagocajadev/league-of-legends-teamfight-mode
 setlocal EnableExtensions EnableDelayedExpansion
@@ -38,7 +38,7 @@ if not exist "%LOL_CONFIG_DIR%" (
 :menu
 cls
 echo.
-echo   league-of-legends-teamfight-mode  v2.0.3  @thiagocajadev
+echo   league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
 echo   --------------------------------------------------------
 echo   Config: %LOL_CONFIG_DIR%
 echo.
@@ -96,6 +96,25 @@ $hotkeyPresets = @{
         PersistedFile = 'Input.ini'
         Section       = 'MouseSettings'
         Key           = 'RollerButtonSpeed'
+        Value         = '0'
+      }
+    )
+  }
+  # why: o combo pressupoe camera solta. Com CameraMode=1 ela ja fica travada
+  # e o [space] nao tem o que fixar, entao o gesto inteiro perde efeito.
+  camera = @{
+    Label    = 'Unlocked camera with lock on Space'
+    Settings = @(
+      @{
+        IniFile = 'input.ini'
+        Section = 'GameEvents'
+        Key     = 'evtCameraSnap'
+        Value   = '[space]'
+      },
+      @{
+        PersistedFile = 'Game.cfg'
+        Section       = 'General'
+        Key           = 'CameraMode'
         Value         = '0'
       }
     )
@@ -407,7 +426,7 @@ function Set-NamedProperty {
 function Invoke-TeamfightMode {
   # why: passo unico e deliberado, garante que todo .bak seja a copia pre-alteracao,
   # sem estado intermediario para o usuario decifrar ao voltar atras
-  $orderedPresets = @($hotkeyPresets.zoom, $hotkeyPresets.range)
+  $orderedPresets = @($hotkeyPresets.zoom, $hotkeyPresets.camera, $hotkeyPresets.range)
   $persistedPath = Join-Path $configDirectory 'PersistedSettings.json'
 
   Backup-ConfigFile -Path $persistedPath
@@ -426,16 +445,37 @@ function Invoke-Preset {
   param([hashtable]$Preset, [string]$PersistedPath)
 
   foreach ($setting in $Preset.Settings) {
-    $iniPath = Join-Path $configDirectory $setting.IniFile
-    Backup-ConfigFile -Path $iniPath
-
-    Set-IniSetting -Path $iniPath -Section $setting.Section -Key $setting.Key -Value $setting.Value
-    Write-Host "  $($setting.IniFile): [$($setting.Section)] $($setting.Key)=$($setting.Value)"
-
-    Set-PersistedSetting -Path $PersistedPath -FileName $setting.PersistedFile `
-      -Section $setting.Section -Key $setting.Key -Value $setting.Value
-    Write-Host "  PersistedSettings.json: $($setting.PersistedFile) / $($setting.Key) = $($setting.Value)"
+    Write-IniTarget -Setting $setting
+    Write-PersistedTarget -Setting $setting -PersistedPath $PersistedPath
   }
+}
+
+# why: nem toda chave mora nos dois arquivos. O destino que o preset nao declara
+# e pulado, senao a chave seria criada no arquivo errado e o cliente a ignoraria
+function Write-IniTarget {
+  param([hashtable]$Setting)
+
+  if ([string]::IsNullOrWhiteSpace($Setting.IniFile)) {
+    return
+  }
+
+  $iniPath = Join-Path $configDirectory $Setting.IniFile
+  Backup-ConfigFile -Path $iniPath
+
+  Set-IniSetting -Path $iniPath -Section $Setting.Section -Key $Setting.Key -Value $Setting.Value
+  Write-Host "  $($Setting.IniFile): [$($Setting.Section)] $($Setting.Key)=$($Setting.Value)"
+}
+
+function Write-PersistedTarget {
+  param([hashtable]$Setting, [string]$PersistedPath)
+
+  if ([string]::IsNullOrWhiteSpace($Setting.PersistedFile)) {
+    return
+  }
+
+  Set-PersistedSetting -Path $PersistedPath -FileName $Setting.PersistedFile `
+    -Section $Setting.Section -Key $Setting.Key -Value $Setting.Value
+  Write-Host "  PersistedSettings.json: $($Setting.PersistedFile) / $($Setting.Key) = $($Setting.Value)"
 }
 
 function Invoke-Restore {
