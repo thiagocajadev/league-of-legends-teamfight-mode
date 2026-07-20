@@ -5,6 +5,16 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.0.3] - 2026-07-20
+
+### Fixed
+
+- **Dois runs de release em paralelo se destruíam.** As tags `v2.0.1` e `v2.0.2` rodaram no mesmo segundo: cada uma criou a sua release e o passo de prune de cada uma apagou a da outra, deixando o repositório com zero releases e levando a `v1.1.0` junto. Resolvido com `concurrency` de group fixo, que serializa os runs, e `cancel-in-progress`, que descarta release antiga ainda em voo.
+
+### Changed
+
+- Prune passou a apagar também as **tags** anteriores, não só as releases. Antes a tag ficava para nomear o commit da versão no histórico; agora o repositório mantém apenas a última tag e a última release, e o `CHANGELOG.md` vira o único registro das versões anteriores.
+
 ## [2.0.2] - 2026-07-20
 
 ### Changed

@@ -113,7 +113,7 @@ Click the link, save the file and double click it. Option `1`, **Apply Teamfight
 A menu opens:
 
 ```text
-  league-of-legends-teamfight-mode  v2.0.2  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.0.3  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 

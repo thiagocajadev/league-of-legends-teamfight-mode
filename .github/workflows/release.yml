@@ -7,6 +7,16 @@ on:
 permissions:
   contents: write
 
+# why: dois runs em paralelo se destroem. Em 2026-07-20 as tags v2.0.1 e v2.0.2
+# rodaram no mesmo segundo: cada uma criou a sua release e o prune de cada uma
+# apagou a da outra, deixando o repositorio com zero releases e levando a v1.1.0
+# junto. Group fixo (nao por tag) serializa tudo em um run so, e cancel-in-progress
+# mata a release antiga em voo, que nao tem valor sob a politica de manter so a
+# ultima.
+concurrency:
+  group: release
+  cancel-in-progress: true
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -27,12 +37,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # why: politica de manter so a ultima release. A tag fica, entao o commit
-      # daquela versao continua nomeado no historico.
-      - name: Prune previous releases
+      # why: politica de manter so a ultima versao publicada, release e tag.
+      # Release antes da tag: apagar a tag primeiro deixaria a release orfa,
+      # que o GitHub rebaixa para draft em vez de remover.
+      # A tag some, entao o commit daquela versao deixa de ter nome. O historico
+      # continua no CHANGELOG.md, que passa a ser o unico registro das versoes
+      # anteriores.
+      - name: Prune previous releases and tags
         run: |
           gh release list --json tagName --jq '.[].tagName' \
             | grep -vxF "$GITHUB_REF_NAME" \
             | xargs -r -I{} gh release delete {} --yes
+
+          # why: lista pela API e nao por `git tag -l`, que so enxerga o que o
+          # checkout trouxe. O checkout padrao e raso e nao busca as outras tags.
+          gh api "repos/$GITHUB_REPOSITORY/git/refs/tags" --jq '.[].ref' \
+            | sed 's#^refs/tags/##' \
+            | grep -vxF "$GITHUB_REF_NAME" \
+            | xargs -r -I{} gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/{}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
