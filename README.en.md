@@ -165,6 +165,7 @@ RollerButtonSpeed=0
 ```
 
 ![Example in input.ini](assets/img/01-exemplo-input-ini.png)
+
 *Example inside input.ini*
 
 Then open `PersistedSettings.json` and add or edit this block:
@@ -182,6 +183,7 @@ Then open `PersistedSettings.json` and add or edit this block:
 ```
 
 ![Example in PersistedSettings.json](assets/img/02-exemplo-persisted-settings.png)
+
 *Example inside PersistedSettings.json*
 
 ### Range, camera and target on Space
@@ -195,6 +197,7 @@ TargetChampionsOnlyAsToggle=0
 ```
 
 ![Example in input.ini](assets/img/03-exemplo-alcance-ataque-input-ini.png)
+
 *Example inside input.ini*
 
 In `PersistedSettings.json`, search for one key at a time with the editor's find box (`Ctrl+F`) and set the values like this. They sit far apart in the file, so do not expect to find the three in sequence:
@@ -215,6 +218,7 @@ In `PersistedSettings.json`, search for one key at a time with the editor's find
 ```
 
 ![Example in PersistedSettings.json](assets/img/04-exemplo-alcance-ataque-persisted-settings.png)
+
 *Example inside PersistedSettings.json*
 
 Save both files and close the editor.
