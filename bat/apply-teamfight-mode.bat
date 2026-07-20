@@ -1,5 +1,5 @@
 @echo off
-:: league-of-legends-teamfight-mode - v2.0.0
+:: league-of-legends-teamfight-mode - v2.0.1
 :: @thiagocajadev
 :: github.com/thiagocajadev/league-of-legends-teamfight-mode
 setlocal EnableExtensions EnableDelayedExpansion
@@ -38,7 +38,7 @@ if not exist "%LOL_CONFIG_DIR%" (
 :menu
 cls
 echo.
-echo   league-of-legends-teamfight-mode  v2.0.0  @thiagocajadev
+echo   league-of-legends-teamfight-mode  v2.0.1  @thiagocajadev
 echo   --------------------------------------------------------
 echo   Config: %LOL_CONFIG_DIR%
 echo.

@@ -5,6 +5,16 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.0.1] - 2026-07-20
+
+### Fixed
+
+- Crédito da imagem apontava para a **Epic Games**, que só distribui o League na loja dela. A arte é da **Riot Games**, agora creditada corretamente e com link para o site oficial.
+
+### Changed
+
+- Créditos da imagem foram para dentro do bloco centralizado, logo abaixo da arte que creditam, em `<sub>`. Antes ficavam soltos à esquerda depois do cabeçalho, distantes da imagem. Usado `<sub>` e não `<small>`, que o sanitizador de HTML do GitHub não garante, e `<a href>` no lugar de link markdown, que não é processado dentro de bloco HTML.
+
 ## [2.0.0] - 2026-07-19
 
 ### Added
