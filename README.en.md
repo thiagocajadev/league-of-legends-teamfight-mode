@@ -76,6 +76,7 @@ None of the three touches the camera: `Space` is already the camera key, and the
 | `evtShowCharacterMenu` | Attack range event. Takes more than one key, separated by a comma |
 | `evtChampionOnly` | Event that makes attacks target champions only, ignoring minions |
 | `TargetChampionsOnlyAsToggle` | Targeting mode. At `0` it holds, at `1` it toggles on and off |
+| **LoL client** | The Riot program that opens before the match. It is what reads and writes these configuration files |
 | **Practice Tool** | Solo game with no opponents. Here it serves to make the client reload the files |
 | `.bak` | Copy of the original file, created before the first edit |
 
@@ -83,7 +84,7 @@ None of the three touches the camera: `Space` is already the camera key, and the
 
 ## Before you start
 
-The client reads these files when a game starts, and rewrites some of them on exit. That is why the order matters:
+The LoL client reads these files when a game starts, and rewrites some of them on exit. That is why the order matters:
 
 | Step | Who does it |
 | :-- | :-- |
@@ -231,7 +232,7 @@ Save both files and close the editor.
 Three ways, from the safest to the bluntest:
 
 1. **Restore the backup.** Run option `2` in the `.bat`, **Restore the original files (.bak)**. It puts back every `.bak` in the `Config` folder, which is the exact state from before the first run.
-2. **Delete the generated files.** With no backup at hand, delete `input.ini` and `PersistedSettings.json` from the `Config` folder. The client recreates both with default values on startup.
+2. **Delete the generated files.** With no backup at hand, delete `input.ini` and `PersistedSettings.json` from the `Config` folder. The LoL client recreates both with default values on startup.
 3. **Restore from the game itself.** Inside League, under **Settings**, there is an option to restore the default settings. It undoes everything without touching a single file.
 
 Ways `2` and `3` also wipe any other option you have tuned in the game, not only Teamfight Mode.

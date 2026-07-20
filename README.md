@@ -76,6 +76,7 @@ Nenhuma das três mexe na camera: o `Espaço` já é a tecla dela, e as duas pri
 | `evtShowCharacterMenu` | Evento do alcance de ataque. Aceita mais de uma tecla, separadas por vírgula |
 | `evtChampionOnly` | Evento que faz o ataque mirar só campeões, ignorando minions |
 | `TargetChampionsOnlyAsToggle` | Modo do alvejar. Em `0` vale enquanto segura, em `1` liga e desliga |
+| **cliente do LoL** | O programa da Riot que abre antes da partida. É ele que lê e grava esses arquivos de configuração |
 | **modo treino** | Partida solo, sem adversários. Aqui serve para o cliente recarregar os arquivos |
 | `.bak` | Cópia do arquivo original, criada antes da primeira edição |
 
@@ -83,7 +84,7 @@ Nenhuma das três mexe na camera: o `Espaço` já é a tecla dela, e as duas pri
 
 ## Antes de começar
 
-O cliente lê esses arquivos ao entrar em partida, e reescreve alguns deles ao fechar. Por isso a ordem importa:
+O cliente do LoL lê esses arquivos ao entrar em partida, e reescreve alguns deles ao fechar. Por isso a ordem importa:
 
 | Passo | Quem faz |
 | :-- | :-- |
@@ -231,7 +232,7 @@ Salve os dois arquivos e feche o editor.
 Três caminhos, do mais seguro ao mais bruto:
 
 1. **Restaurar o backup.** Rode a opção `2` do `.bat`, **Restaurar os arquivos originais (.bak)**. Ela devolve todo `.bak` da pasta `Config`, que é o estado exato de antes da primeira execução.
-2. **Apagar os arquivos gerados.** Sem backup à mão, apague o `input.ini` e o `PersistedSettings.json` da pasta `Config`. O cliente recria os dois com os valores padrão ao iniciar.
+2. **Apagar os arquivos gerados.** Sem backup à mão, apague o `input.ini` e o `PersistedSettings.json` da pasta `Config`. O cliente do LoL recria os dois com os valores padrão ao iniciar.
 3. **Restaurar pelo próprio jogo.** Dentro do League, em **Configurações**, existe a opção de restaurar as configurações padrão. Serve para desfazer tudo sem tocar em arquivo nenhum.
 
 Os caminhos `2` e `3` zeram também as outras opções que você tenha ajustado no jogo, não só o Modo Teamfight.
