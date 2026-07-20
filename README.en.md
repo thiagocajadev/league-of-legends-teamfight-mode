@@ -1,6 +1,6 @@
 <div align="center">
   <img src="assets/img/lol.png" alt="league-of-legends-teamfight-mode" width="480">
-  <p><sub>Image credits: <a href="https://www.riotgames.com/">Riot Games</a></sub></p>
+  <p><sub>Image credits: <a href="https://www.leagueoflegends.com/en-us/">Riot Games</a></sub></p>
   <h1 align="center">League Of Legends - Teamfight Mode</h1>
   <p align="center">
     League of Legends keybinds the client will not let you set from the interface.<br>
@@ -113,7 +113,7 @@ Click the link, save the file and double click it. Option `1`, **Apply Teamfight
 A menu opens:
 
 ```text
-  league-of-legends-teamfight-mode  v2.0.1  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.0.2  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 

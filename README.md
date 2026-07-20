@@ -1,6 +1,6 @@
 <div align="center">
   <img src="assets/img/lol.png" alt="league-of-legends-teamfight-mode" width="480">
-  <p><sub>Créditos da imagem: <a href="https://www.riotgames.com/">Riot Games</a></sub></p>
+  <p><sub>Créditos da imagem: <a href="https://www.leagueoflegends.com/pt-br/">Riot Games</a></sub></p>
   <h1 align="center">League Of Legends - Modo Teamfight</h1>
   <p align="center">
     Atalhos de teclado do League of Legends que o cliente não deixa configurar pela interface.<br>
@@ -113,7 +113,7 @@ Clique no link, salve o arquivo e dê dois cliques nele. A opção `1`, **Aplica
 Abre um menu:
 
 ```text
-  league-of-legends-teamfight-mode  v2.0.1  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.0.2  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 

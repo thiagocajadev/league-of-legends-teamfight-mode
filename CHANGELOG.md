@@ -5,6 +5,12 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.0.2] - 2026-07-20
+
+### Changed
+
+- Link do crédito da imagem passou do site institucional da Riot para o site do próprio jogo, no idioma de cada README: `leagueoflegends.com/pt-br` no pt-BR e `/en-us` no inglês.
+
 ## [2.0.1] - 2026-07-20
 
 ### Fixed
