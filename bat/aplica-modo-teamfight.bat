@@ -1,9 +1,9 @@
 @echo off
-:: league-of-legends-hotkeys - v1.1.0
+:: league-of-legends-teamfight-mode - v2.0.0
 :: @thiagocajadev
-:: github.com/thiagocajadev/league-of-legends-hotkeys
+:: github.com/thiagocajadev/league-of-legends-teamfight-mode
 setlocal EnableExtensions EnableDelayedExpansion
-title league-of-legends-hotkeys
+title league-of-legends-teamfight-mode
 
 set "SELF=%~f0"
 set "LOL_DIR="
@@ -38,27 +38,25 @@ if not exist "%LOL_CONFIG_DIR%" (
 :menu
 cls
 echo.
-echo   league-of-legends-hotkeys  v1.1.0  @thiagocajadev
-echo   ---------------------------------------------
+echo   league-of-legends-teamfight-mode  v2.0.0  @thiagocajadev
+echo   --------------------------------------------------------
 echo   Config: %LOL_CONFIG_DIR%
 echo.
-echo   [1] Desabilitar zoom via scroll do mouse
-echo   [2] Alcance + fixar camera + alvejar campeoes (Espaco)
-echo   [3] Restaurar os arquivos originais (.bak)
+echo   [1] Aplicar o Modo Teamfight
+echo       zoom travado e alcance, camera e alvo no Espaco
+echo       menos misclick, mais leitura de luta
+echo.
+echo   [2] Restaurar os arquivos originais (.bak)
 echo   [0] Sair
 echo.
 set "MENU_CHOICE="
 set /p "MENU_CHOICE=Escolha uma opcao: "
 
 if "%MENU_CHOICE%"=="1" (
-  set "HOTKEY_ACTION=zoom"
+  set "HOTKEY_ACTION=apply"
   goto engine
 )
 if "%MENU_CHOICE%"=="2" (
-  set "HOTKEY_ACTION=range"
-  goto engine
-)
-if "%MENU_CHOICE%"=="3" (
   set "HOTKEY_ACTION=restore"
   goto engine
 )
@@ -235,7 +233,7 @@ function Set-IniSetting {
   param([string]$Path, [string]$Section, [string]$Key, [string]$Value)
 
   # why: arquivo ausente significa que o cliente nunca gravou config. Criar um do zero
-  # produziria arquivo sem .bak, que a opcao 3 nao saberia desfazer
+  # produziria arquivo sem .bak, que a opcao 2 nao saberia desfazer
   if (-not (Test-Path -LiteralPath $Path)) {
     Write-Host "  $(Split-Path $Path -Leaf) ausente, ignorado"
     return
@@ -406,12 +404,26 @@ function Set-NamedProperty {
   $Target.$Name = $Value
 }
 
-function Invoke-Preset {
-  param([hashtable]$Preset)
-
+function Invoke-TeamfightMode {
+  # why: passo unico e deliberado, garante que todo .bak seja a copia pre-alteracao,
+  # sem estado intermediario para o usuario decifrar ao voltar atras
+  $orderedPresets = @($hotkeyPresets.zoom, $hotkeyPresets.range)
   $persistedPath = Join-Path $configDirectory 'PersistedSettings.json'
 
   Backup-ConfigFile -Path $persistedPath
+
+  foreach ($preset in $orderedPresets) {
+    Write-Host "  $($preset.Label)"
+    Invoke-Preset -Preset $preset -PersistedPath $persistedPath
+  }
+
+  Write-Host ""
+  Write-Host "OK - Modo Teamfight aplicado"
+  Write-Host "Feche o modo treino e abra de novo para recarregar as configuracoes."
+}
+
+function Invoke-Preset {
+  param([hashtable]$Preset, [string]$PersistedPath)
 
   foreach ($setting in $Preset.Settings) {
     $iniPath = Join-Path $configDirectory $setting.IniFile
@@ -420,14 +432,10 @@ function Invoke-Preset {
     Set-IniSetting -Path $iniPath -Section $setting.Section -Key $setting.Key -Value $setting.Value
     Write-Host "  $($setting.IniFile): [$($setting.Section)] $($setting.Key)=$($setting.Value)"
 
-    Set-PersistedSetting -Path $persistedPath -FileName $setting.PersistedFile `
+    Set-PersistedSetting -Path $PersistedPath -FileName $setting.PersistedFile `
       -Section $setting.Section -Key $setting.Key -Value $setting.Value
     Write-Host "  PersistedSettings.json: $($setting.PersistedFile) / $($setting.Key) = $($setting.Value)"
   }
-
-  Write-Host ""
-  Write-Host "OK - $($Preset.Label)"
-  Write-Host "Feche o modo treino e abra de novo para recarregar as configuracoes."
 }
 
 function Invoke-Restore {
@@ -464,5 +472,5 @@ if ($action -eq 'restore') {
   exit 0
 }
 
-Invoke-Preset -Preset $hotkeyPresets[$action]
+Invoke-TeamfightMode
 exit 0

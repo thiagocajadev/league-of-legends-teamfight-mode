@@ -18,7 +18,7 @@ jobs:
       - name: Check version matches tag
         run: |
           for file in bat/*.bat; do
-            grep -qF ":: league-of-legends-hotkeys - $GITHUB_REF_NAME" "$file" \
+            grep -qF ":: league-of-legends-teamfight-mode - $GITHUB_REF_NAME" "$file" \
               || { echo "::error file=$file::version header does not match tag $GITHUB_REF_NAME"; exit 1; }
           done
 

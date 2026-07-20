@@ -5,6 +5,28 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.0.0] - 2026-07-19
+
+### Added
+
+- Nome para o conjunto de configurações: **Modo Teamfight** no pt-BR, **Teamfight Mode** no inglês. Antes as duas configs eram descritas só pelo que faziam, sem um nome que a pessoa pudesse procurar ou divulgar.
+- Seção "Não gostou? Volte ao padrão" nos dois READMEs, com os três caminhos de reversão: restaurar o `.bak`, apagar os arquivos gerados, ou usar a opção de restaurar configurações padrão dentro do jogo.
+- Resumo de duas linhas antes dos detalhes: apertar `Espaço` liga, soltar volta ao normal. O detalhamento técnico foi para um bloco recolhível.
+
+### Changed
+
+- **BREAKING**: o menu passou a ter um passo só. A opção `1` aplica zoom e atalhos na mesma execução, e a antiga opção `3` de restaurar virou `2`. Aplicar tudo de uma vez garante que todo `.bak` seja a cópia anterior a qualquer alteração, sem estado intermediário para o usuário decifrar ao voltar atrás.
+- **BREAKING**: repositório renomeado de `league-of-legends-hotkeys` para `league-of-legends-teamfight-mode`.
+- **BREAKING**: os scripts perderam o sufixo de idioma e passaram a se identificar pelo próprio nome. `apply-hotkeys-pt-br.bat` virou `aplica-modo-teamfight.bat`, e `apply-hotkeys-en.bat` virou `apply-teamfight-mode.bat`. Nenhuma release havia sido publicada, então nenhum link de download existente quebra.
+- `Invoke-Preset` deixou de fazer o backup do `PersistedSettings.json` e de imprimir o encerramento. Isso subiu para `Invoke-TeamfightMode`, que orquestra os dois presets e garante um backup único antes do laço.
+- Conceitos fundamentais, funcionamento do `.bat` e passo a passo manual viraram blocos recolhíveis. O gif e o link de download ficaram fora deles, por serem o que prende o leitor e o que converte.
+- Gif da Jinx ampliado para 384px de largura, 20% acima do tamanho nativo.
+
+### Fixed
+
+- Comentário `# why:` em `Set-IniSetting` citava a opção `3` do menu, que deixou de existir na renumeração.
+- Régua de tracinhos do cabeçalho do menu acompanhava o nome antigo e ficou curta depois da renomeação.
+
 ## [1.1.0] - 2026-07-19
 
 ### Added
@@ -71,7 +93,8 @@ e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Os dois caminhos de edição, `input.ini` e `PersistedSettings.json`, com imagens de exemplo.
 - Seção de dicas finais, com a orientação de apagar os arquivos para o cliente recriá-los.
 
-[1.1.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/tag/v1.1.0
-[1.0.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/releases/tag/v1.0.0
-[0.2.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/compare/d9883d9...86a2bb2
-[0.1.0]: https://github.com/thiagocajadev/league-of-legends-hotkeys/commits/d9883d9
+[2.0.0]: https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/tag/v2.0.0
+[1.1.0]: https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/tag/v1.1.0
+[1.0.0]: https://github.com/thiagocajadev/league-of-legends-teamfight-mode/releases/tag/v1.0.0
+[0.2.0]: https://github.com/thiagocajadev/league-of-legends-teamfight-mode/compare/d9883d9...86a2bb2
+[0.1.0]: https://github.com/thiagocajadev/league-of-legends-teamfight-mode/commits/d9883d9
