@@ -128,7 +128,7 @@ Click the link, save the file and double click it. Option `1`, **Apply Teamfight
 A menu opens:
 
 ```text
-  league-of-legends-teamfight-mode  v2.2.0  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.2.1  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
@@ -255,15 +255,22 @@ Then open `PersistedSettings.json` and add or edit this block:
 
 ### Unlocked camera with lock on Space
 
-These two keys are the exception: each one lives in a single file, with no counterpart in the other.
-
 In `input.ini`, under the `[GameEvents]` section, add or edit this line:
 
 ```ini
 evtCameraSnap=[space]
 ```
 
-In `PersistedSettings.json`, find the `General` section and set `CameraMode` like this:
+In `PersistedSettings.json`, find `evtCameraSnap` and set the value like this:
+
+```json
+{
+    "name": "evtCameraSnap",
+    "value": "[space]"
+},
+```
+
+`CameraMode` is the exception: it lives only in `PersistedSettings.json`, with no counterpart in `input.ini`. Find the `General` section and set the value like this:
 
 ```json
 {

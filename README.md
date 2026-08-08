@@ -128,7 +128,7 @@ Clique no link, salve o arquivo e dê dois cliques nele. A opção `1`, **Aplica
 Abre um menu:
 
 ```text
-  league-of-legends-teamfight-mode  v2.2.0  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.2.1  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
@@ -255,15 +255,22 @@ Depois abra o `PersistedSettings.json` e adicione ou edite o bloco:
 
 ### Câmera solta com trava no Espaço
 
-Estas duas chaves são a exceção: cada uma vive em um arquivo só, sem par no outro.
-
 No `input.ini`, na seção `[GameEvents]`, adicione ou edite a linha:
 
 ```ini
 evtCameraSnap=[space]
 ```
 
-No `PersistedSettings.json`, procure a seção `General` e deixe o `CameraMode` assim:
+No `PersistedSettings.json`, procure o `evtCameraSnap` e deixe o valor assim:
+
+```json
+{
+    "name": "evtCameraSnap",
+    "value": "[space]"
+},
+```
+
+O `CameraMode` é a exceção: vive só no `PersistedSettings.json`, sem par no `input.ini`. Procure a seção `General` e deixe o valor assim:
 
 ```json
 {

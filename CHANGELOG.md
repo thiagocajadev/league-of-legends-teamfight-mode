@@ -5,6 +5,13 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.2.1] - 2026-08-08
+
+### Fixed
+
+- **A tecla escolhida na opção `3` agora chega ao `evtCameraSnap` dos dois arquivos.** O preset `camera` declarava só o `input.ini`, então o `PersistedSettings.json` mantinha o `[space]` de fábrica e o cliente o sobrepunha ao carregar. Na prática a câmera continuava travando no `Espaço` enquanto o alcance já respondia à tecla nova, e o combo exigia as duas pressionadas juntas. A opção `1` não mostrava o problema porque a tecla padrão é o próprio `Espaço`, igual ao valor de fábrica.
+- Passo manual da câmera solta nos dois READMEs. O texto dizia que as duas chaves viviam num arquivo só, o que valia para o `CameraMode` e não para o `evtCameraSnap`. O passo do `PersistedSettings.json` para o `evtCameraSnap` estava faltando.
+
 ## [2.2.0] - 2026-08-08
 
 ### Added
