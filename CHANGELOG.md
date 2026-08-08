@@ -14,6 +14,7 @@ e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Recusa de `C` e `N`, que são as modificadoras do combo. Escolher uma delas geraria `evtShowCharacterMenu=[c],[c]` e o par colapsaria numa tecla só.
 - Varredura de conflito no `input.ini` antes de gravar. O assistente lista todo `evt*` que já usa a tecla escolhida, dentro da própria confirmação, e a decisão fica com o jogador.
 - Bloco recolhível da opção `3` nos dois READMEs, com a transcrição do assistente, tabela de etapas e a nota de que a grafia acima de `[Button 5]` ainda não foi conferida contra arquivo real.
+- Convite para jogar, depois das referências nos dois READMEs, com o servidor e o Riot ID.
 
 ### Changed
 

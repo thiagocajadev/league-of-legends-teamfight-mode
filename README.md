@@ -347,6 +347,12 @@ Três caminhos, do mais seguro ao mais bruto:
 - [Reddit: conversa sobre desativar o scroll](https://www.reddit.com/r/leagueoflegends/comments/tvib4a/disable_zooming_inout_with_mouse_scroll_wheel/?rdt=56391)
 - [Reddit: exibir alcance do ataque](https://www.reddit.com/r/ADCMains/comments/1ejlzg5/comment/lgh39ku/?tl=pt-br)
 
+## Você é jogador de ARAM?
+
+Legal! Me adicione para perdermos juntos 😅
+
+Servidor BR, Riot ID `NextFF #spfc`.
+
 ## Licença
 
 MIT, thiagocajadev.

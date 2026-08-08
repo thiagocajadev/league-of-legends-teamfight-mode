@@ -347,6 +347,12 @@ Three ways, from the safest to the bluntest:
 - [Reddit: thread on disabling the scroll zoom](https://www.reddit.com/r/leagueoflegends/comments/tvib4a/disable_zooming_inout_with_mouse_scroll_wheel/?rdt=56391)
 - [Reddit: showing the attack range](https://www.reddit.com/r/ADCMains/comments/1ejlzg5/comment/lgh39ku/)
 
+## Do you play ARAM?
+
+Nice! Add me and let's lose together 😅
+
+BR server, Riot ID `NextFF #spfc`.
+
 ## License
 
 MIT, thiagocajadev.
