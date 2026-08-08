@@ -128,15 +128,16 @@ Click the link, save the file and double click it. Option `1`, **Apply Teamfight
 A menu opens:
 
 ```text
-  league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.2.0  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
   [1] Apply Teamfight Mode
-      zoom locked, range, camera and target on Space
+      zoom locked. Range, camera and target on Space
       fewer misclicks, better fight reads
 
   [2] Restore the original files (.bak)
+  [3] Advanced: swap Space for another key
   [0] Exit
 ```
 
@@ -144,6 +145,7 @@ A menu opens:
 | :-- | :-- |
 | `1` | `RollerButtonSpeed=0`, the two unlocked camera keys and the three for range and targeting |
 | `2` | Restores every `.bak` in the `Config` folder back to its original name |
+| `3` | The same as `1`, with the combo key you picked |
 
 - **One step, on purpose.** The settings are applied in the same run. That way every `.bak` is always the copy from before any change, and there is no in-between state for you to decode if you decide to roll back.
 - **Automatic backup.** The first time you run `1`, every file it touches gets a `.bak` next to it. Running again does not overwrite that backup, otherwise the "original" copy would become a copy of the already modified file.
@@ -152,6 +154,53 @@ A menu opens:
 - **Finds the install on its own.** With the game open, the `.bat` reads the path from the running process, so it works with League installed on any drive or folder. With the game closed, it tries the Riot metadata, then the default path, and only then asks.
 
 If the `Config` folder does not exist, it says so and exits without writing anything.
+
+</details>
+
+<details>
+<summary><b>If you prefer a key other than <code>Space</code>, pick option <code>3</code> Advanced</b></summary>
+<br>
+
+`Space` is the default because it sits under your thumb and does not compete with the ability keys. If it is already taken in your setup, option `3` builds the same Teamfight Mode on another key.
+
+The wizard asks before it writes, and every answer is a single key press:
+
+```text
+  Advanced Mode
+  ------------------------------------------------
+  Teamfight Mode uses Space as the combo key.
+
+  Off the list: C and N, already in the combo, M opens the mouse and Esc cancels.
+  Use a letter, a number, F1 to F12, space, tab or an extra mouse button.
+
+  Swap Space for another key? (Y/n): Y
+
+  Press the key you want.
+  [M] opens the mouse buttons, [Esc] cancels.
+
+  Key: V
+
+  Heads up: this key is already in use in input.ini:
+    evtCastAvatarSpell1=[v]
+
+  [Y] map on V   [N] pick another key   [Esc] cancel
+  Confirm? (Y/n): Y
+```
+
+Answering `N` to the first question applies Teamfight Mode on `Space`, same as option `1`.
+
+| Step | What happens |
+| :-- | :-- |
+| Key choice | One press, no typing a name. Takes a letter, a number, `F1` to `F12`, space, tab or a mouse button |
+| Refused keys | `C` and `N` are the combo modifiers, and would collapse the pair into a single key. `M` opens the mouse menu and `Esc` cancels, so they stay out too |
+| Mouse buttons | Extras only, between `4` and `9`. Left, right and scroll stay out because the game already uses all three |
+| Key off the list | The wizard says so and asks again. A mistyped key ends nothing |
+| Confirmation | The conflict warning comes with it. `Y` applies, `N` goes back to the key choice, `Esc` exits without writing, and `Enter` means `Y` |
+
+The key you pick goes into the three combo settings: `evtCameraSnap`, `evtShowCharacterMenu` and `evtChampionOnly`. `RollerButtonSpeed`, `CameraMode` and `TargetChampionsOnlyAsToggle` do not depend on a key and stay the same as option `1`.
+
+> [!NOTE]
+> A mouse button is written as `[Button 4]` through `[Button 9]`. If the bind does not take in game, use option `2` to restore and pick a keyboard key.
 
 </details>
 

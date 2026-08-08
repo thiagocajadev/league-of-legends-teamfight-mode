@@ -1,5 +1,5 @@
 @echo off
-:: league-of-legends-teamfight-mode - v2.1.0
+:: league-of-legends-teamfight-mode - v2.2.0
 :: @thiagocajadev
 :: github.com/thiagocajadev/league-of-legends-teamfight-mode
 setlocal EnableExtensions EnableDelayedExpansion
@@ -38,15 +38,16 @@ if not exist "%LOL_CONFIG_DIR%" (
 :menu
 cls
 echo.
-echo   league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
+echo   league-of-legends-teamfight-mode  v2.2.0  @thiagocajadev
 echo   --------------------------------------------------------
 echo   Config: %LOL_CONFIG_DIR%
 echo.
 echo   [1] Apply Teamfight Mode
-echo       zoom locked, range, camera and target on Space
+echo       zoom locked. Range, camera and target on Space
 echo       fewer misclicks, better fight reads
 echo.
 echo   [2] Restore the original files (.bak)
+echo   [3] Advanced: swap Space for another key
 echo   [0] Exit
 echo.
 set "MENU_CHOICE="
@@ -58,6 +59,10 @@ if "%MENU_CHOICE%"=="1" (
 )
 if "%MENU_CHOICE%"=="2" (
   set "HOTKEY_ACTION=restore"
+  goto engine
+)
+if "%MENU_CHOICE%"=="3" (
+  set "HOTKEY_ACTION=advanced"
   goto engine
 )
 if "%MENU_CHOICE%"=="0" exit /b 0
@@ -85,69 +90,96 @@ $ErrorActionPreference = 'Stop'
 $configDirectory = $env:LOL_CONFIG_DIR
 $action = $env:HOTKEY_ACTION
 
-# why: a Riot grava o mesmo arquivo como "Input.ini" e "input.ini" conforme a versao,
-# entao o nome do disco e o nome dentro do JSON sao declarados separados
-$hotkeyPresets = @{
-  zoom = @{
-    Label    = 'Zoom via mouse scroll disabled'
-    Settings = @(
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'MouseSettings'
-        Key           = 'RollerButtonSpeed'
-        Value         = '0'
-      }
-    )
+# why: for a non-printing key RawUI.ReadKey returns a Windows virtual key code, not a
+# character. Named here because a bare number inside an if says nothing
+$escapeKeyCode = 27
+$enterKeyCode = 13
+$mouseMenuKeyCode = 77
+$spaceKeyCode = 32
+$tabKeyCode = 9
+$firstFunctionKeyCode = 112
+$lastFunctionKeyCode = 123
+
+# why: the questions have three exits, not two. "No" moves on to another useful path,
+# and only Esc gives up, so a boolean would not cover it
+$answerYes = 'yes'
+$answerNo = 'no'
+$answerCancel = 'cancel'
+$answerEchoes = @{ yes = 'Y'; no = 'N'; cancel = 'canceled' }
+
+# why: the game reserves left, right and scroll for moving, attacking and zooming. The
+# range starts at 4 and goes to 9 to cover mice with more than two extra buttons
+$extraMouseButtonPattern = '^[4-9]$'
+
+# why: Riot writes the same file as "Input.ini" and "input.ini" depending on the
+# version, so the name on disk and the name inside the JSON are declared separately
+function Get-HotkeyPresets {
+  param([string]$TriggerKey = '[space]', [string]$TriggerLabel = 'Space')
+
+  $presets = @{
+    zoom = @{
+      Label    = 'Zoom via mouse scroll disabled'
+      Settings = @(
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'MouseSettings'
+          Key           = 'RollerButtonSpeed'
+          Value         = '0'
+        }
+      )
+    }
+    # why: the combo assumes an unlocked camera. With CameraMode=1 it is already
+    # locked and the combo key has nothing to snap, so the whole gesture loses effect.
+    camera = @{
+      Label    = "Unlocked camera with lock on $TriggerLabel"
+      Settings = @(
+        @{
+          IniFile = 'input.ini'
+          Section = 'GameEvents'
+          Key     = 'evtCameraSnap'
+          Value   = $TriggerKey
+        },
+        @{
+          PersistedFile = 'Game.cfg'
+          Section       = 'General'
+          Key           = 'CameraMode'
+          Value         = '0'
+        }
+      )
+    }
+    # why: the three settings only work together. The repeated key ties range, camera
+    # and target to the same gesture, and AsToggle=0 keeps it active while held.
+    # At 1 it would become on/off and the combination breaks.
+    range = @{
+      Label    = 'Attack range, lock camera and target champions'
+      Settings = @(
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'GameEvents'
+          Key           = 'evtShowCharacterMenu'
+          Value         = "[c],$TriggerKey"
+        },
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'GameEvents'
+          Key           = 'evtChampionOnly'
+          Value         = "[n],$TriggerKey"
+        },
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'GameEvents'
+          Key           = 'TargetChampionsOnlyAsToggle'
+          Value         = '0'
+        }
+      )
+    }
   }
-  # why: o combo pressupoe camera solta. Com CameraMode=1 ela ja fica travada
-  # e o [space] nao tem o que fixar, entao o gesto inteiro perde efeito.
-  camera = @{
-    Label    = 'Unlocked camera with lock on Space'
-    Settings = @(
-      @{
-        IniFile = 'input.ini'
-        Section = 'GameEvents'
-        Key     = 'evtCameraSnap'
-        Value   = '[space]'
-      },
-      @{
-        PersistedFile = 'Game.cfg'
-        Section       = 'General'
-        Key           = 'CameraMode'
-        Value         = '0'
-      }
-    )
-  }
-  # why: as tres chaves so funcionam juntas. O [space] repetido amarra alcance,
-  # camera e alvo no mesmo gesto, e o AsToggle=0 faz valer enquanto segura.
-  # Em 1 viraria liga/desliga e a combinacao quebra.
-  range = @{
-    Label    = 'Attack range, lock camera and target champions'
-    Settings = @(
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'GameEvents'
-        Key           = 'evtShowCharacterMenu'
-        Value         = '[c],[space]'
-      },
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'GameEvents'
-        Key           = 'evtChampionOnly'
-        Value         = '[n],[space]'
-      },
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'GameEvents'
-        Key           = 'TargetChampionsOnlyAsToggle'
-        Value         = '0'
-      }
-    )
-  }
+
+  return $presets
 }
 
 function Find-LeagueDirectory {
@@ -162,7 +194,7 @@ function Find-LeagueDirectory {
 }
 
 function Find-DirectoryFromProcess {
-  # why: o executavel do jogo fica em <instalacao>\Game, o do cliente na raiz
+  # why: the game executable sits in <install>\Game, the client one in the root
   $executableNames = @('League of Legends.exe', 'LeagueClient.exe')
 
   foreach ($executableName in $executableNames) {
@@ -190,7 +222,7 @@ function Find-DirectoryFromProcess {
 function Get-ProcessExecutablePath {
   param([string]$ExecutableName)
 
-  # why: o anticheat bloqueia .Path do Get-Process, e o CIM costuma passar
+  # why: the anticheat blocks .Path from Get-Process, and CIM usually gets through
   try {
     $filter = "name='$ExecutableName'"
     $processEntry = Get-CimInstance Win32_Process -Filter $filter -ErrorAction SilentlyContinue |
@@ -239,7 +271,7 @@ function Backup-ConfigFile {
   $backupPath = "$Path.bak"
   $hasBackup = Test-Path -LiteralPath $backupPath
 
-  # why: rodar duas vezes nao pode sobrescrever o backup com o arquivo ja modificado
+  # why: running twice cannot overwrite the backup with the already modified file
   if ($hasBackup -or -not (Test-Path -LiteralPath $Path)) {
     return
   }
@@ -251,8 +283,8 @@ function Backup-ConfigFile {
 function Set-IniSetting {
   param([string]$Path, [string]$Section, [string]$Key, [string]$Value)
 
-  # why: arquivo ausente significa que o cliente nunca gravou config. Criar um do zero
-  # produziria arquivo sem .bak, que a opcao 2 nao saberia desfazer
+  # why: a missing file means the client never wrote config. Creating one from scratch
+  # would produce a file with no .bak, which option 2 would not know how to undo
   if (-not (Test-Path -LiteralPath $Path)) {
     Write-Host "  $(Split-Path $Path -Leaf) missing, skipped"
     return
@@ -272,8 +304,8 @@ function Set-IniSetting {
     $keyIndex = Find-KeyIndex -Lines $lines -Key $Key -From ($sectionIndex + 1) -To $sectionEnd
   }
 
-  # why: a Riot nem sempre guarda a chave na secao que a gente espera. Achar onde ela
-  # ja esta evita criar uma segunda copia numa secao errada, que o cliente ignoraria
+  # why: Riot does not always keep the setting in the section we expect. Finding where
+  # it already sits avoids a second copy in a wrong section, which the client ignores
   if ($keyIndex -lt 0) {
     $keyIndex = Find-KeyIndex -Lines $lines -Key $Key -From 0 -To $lines.Count
   }
@@ -348,8 +380,8 @@ function Set-PersistedSetting {
 
   $root = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
 
-  # why: as chaves ficam espalhadas por secoes diferentes, entao procurar no arquivo
-  # inteiro evita criar uma segunda copia na secao declarada, que o cliente ignoraria
+  # why: the settings are spread across different sections, so searching the whole file
+  # avoids a second copy in the declared section, which the client would ignore
   $existing = Find-PersistedSetting -Root $root -Key $Key
 
   if ($null -ne $existing) {
@@ -423,10 +455,349 @@ function Set-NamedProperty {
   $Target.$Name = $Value
 }
 
+function Invoke-AdvancedMode {
+  Write-Host "  Advanced Mode"
+  Write-Host "  ------------------------------------------------"
+  Write-Host "  Teamfight Mode uses Space as the combo key."
+  Write-Host ""
+  Write-Host "  Off the list: C and N, already in the combo, M opens the mouse and Esc cancels."
+  Write-Host "  Use a letter, a number, F1 to F12, space, tab or an extra mouse button."
+  Write-Host ""
+
+  $wantsSwap = Read-Answer -Question '  Swap Space for another key? (Y/n): '
+
+  if ($wantsSwap -eq $answerCancel) {
+    Show-CancelNotice
+    return
+  }
+
+  if ($wantsSwap -eq $answerNo) {
+    Write-Host ""
+    Invoke-TeamfightMode
+    return
+  }
+
+  $trigger = Read-TriggerUntilConfirmed
+
+  if ($null -eq $trigger) {
+    Show-CancelNotice
+    return
+  }
+
+  Write-Host ""
+  Invoke-TeamfightMode -TriggerKey $trigger.Token -TriggerLabel $trigger.Label
+}
+
+function Show-CancelNotice {
+  Write-Host ""
+  Write-Host "Canceled. Nothing was changed."
+}
+
+function Read-TriggerUntilConfirmed {
+  # why: the choice repeats until confirmed, and nothing is written before that. A wrong
+  # key never becomes a file change, which option 2 would have to undo afterwards
+  while ($true) {
+    $candidate = Read-TriggerCandidate
+
+    if ($null -eq $candidate) {
+      $canceled = $null
+      return $canceled
+    }
+
+    $answer = Confirm-Trigger -Candidate $candidate
+
+    if ($answer -eq $answerCancel) {
+      $abandoned = $null
+      return $abandoned
+    }
+
+    if ($answer -eq $answerYes) {
+      return $candidate
+    }
+  }
+}
+
+function Read-TriggerCandidate {
+  # why: a key off the list only repeats the question, and Esc is the single way out.
+  # Without this a wrong key would end the wizard, mixing "mistyped" with "gave up"
+  while ($true) {
+    $pressed = Read-PressedTriggerKey
+
+    if ($pressed.VirtualKeyCode -eq $escapeKeyCode) {
+      $canceled = $null
+      return $canceled
+    }
+
+    $token = Read-TokenFromKey -PressedKey $pressed
+    $candidate = New-TriggerCandidate -Token $token
+
+    if ($null -ne $candidate) {
+      return $candidate
+    }
+  }
+}
+
+function Read-PressedTriggerKey {
+  Write-Host ""
+  Write-Host "  Press the key you want."
+  Write-Host "  [M] opens the mouse buttons, [Esc] cancels."
+  Write-Host ""
+  Write-Host -NoNewline "  Key: "
+
+  $pressed = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+  return $pressed
+}
+
+function Read-TokenFromKey {
+  param($PressedKey)
+
+  if ($PressedKey.VirtualKeyCode -eq $mouseMenuKeyCode) {
+    Write-Host "M"
+    $mouseToken = Read-MouseButton
+    return $mouseToken
+  }
+
+  $keyboardToken = ConvertTo-HotkeyToken -PressedKey $PressedKey
+  return $keyboardToken
+}
+
+function New-TriggerCandidate {
+  param([string]$Token)
+
+  if ([string]::IsNullOrWhiteSpace($Token)) {
+    Write-Host ""
+    Write-Host "  Key not supported. Use a letter, a number, F1 to F12, space, tab or mouse."
+    $unsupported = $null
+    return $unsupported
+  }
+
+  if (Test-ReservedToken -Token $Token) {
+    Write-Host ""
+    Write-Host "  $Token already belongs to the combo. The pair would collapse into one key."
+    $reserved = $null
+    return $reserved
+  }
+
+  # why: ReadKey runs with NoEcho, so without this Write-Host the prompt line stays
+  # open and the next question comes out glued to it
+  $label = ConvertTo-KeyLabel -Token $Token
+  Write-Host $label
+
+  $candidate = [pscustomobject]@{ Token = $Token; Label = $label }
+  return $candidate
+}
+
+# why: narrow allowlist on purpose. LoL token spelling is only known for sure for
+# letters, digits, F1-F12, space and tab. Accepting anything else would write a bind
+# the game silently ignores, and the user would blame the script
+function ConvertTo-HotkeyToken {
+  param($PressedKey)
+
+  $virtualKey = $PressedKey.VirtualKeyCode
+
+  if ($virtualKey -ge $firstFunctionKeyCode -and $virtualKey -le $lastFunctionKeyCode) {
+    $functionKey = "[f$($virtualKey - $firstFunctionKeyCode + 1)]"
+    return $functionKey
+  }
+
+  if ($virtualKey -eq $spaceKeyCode) {
+    $spaceKey = '[space]'
+    return $spaceKey
+  }
+
+  if ($virtualKey -eq $tabKeyCode) {
+    $tabKey = '[tab]'
+    return $tabKey
+  }
+
+  $character = "$($PressedKey.Character)"
+
+  if ($character -match '^[a-zA-Z0-9]$') {
+    $printableKey = "[$($character.ToLower())]"
+    return $printableKey
+  }
+
+  $unsupported = $null
+  return $unsupported
+}
+
+function Read-MouseButton {
+  Write-Host ""
+  Write-Host "  Left, right and scroll stay out: the game already uses all three."
+  Write-Host "  Pick the extra button, between 4 and 9. Most mice have 4 and 5."
+  Write-Host ""
+  Write-Host -NoNewline "  Button: "
+
+  $pressed = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+  $chosen = "$($pressed.Character)"
+  Write-Host $chosen
+
+  if ($chosen -notmatch $extraMouseButtonPattern) {
+    $invalid = $null
+    return $invalid
+  }
+
+  # why: LoL writes mouse buttons with a capital B, "[Button 4]", unlike keyboard keys,
+  # which stay lowercase. This is not a spelling slip, it is the file format
+  $buttonToken = "[Button $chosen]"
+  return $buttonToken
+}
+
+function Test-ReservedToken {
+  param([string]$Token)
+
+  # why: [c] and [n] are already the combo modifiers. Picking one would produce
+  # evtShowCharacterMenu=[c],[c], and a pair of equal keys becomes a single key
+  $reservedTokens = @('[c]', '[n]')
+  $isReserved = $reservedTokens -contains $Token
+  return $isReserved
+}
+
+function ConvertTo-KeyLabel {
+  param([string]$Token)
+
+  $bareName = $Token.Trim('[', ']')
+
+  if ($bareName -eq 'space') {
+    $spaceLabel = 'Space'
+    return $spaceLabel
+  }
+
+  if ($bareName -like 'Button *') {
+    $buttonLabel = "Mouse button $($bareName.Split(' ')[-1])"
+    return $buttonLabel
+  }
+
+  $upperLabel = $bareName.ToUpper()
+  return $upperLabel
+}
+
+function Confirm-Trigger {
+  param($Candidate)
+
+  # why: the conflict goes inside the confirmation itself. Asking "use it anyway" and
+  # then "confirm" would be two questions for the same decision
+  Show-KeyConflict -Token $Candidate.Token
+
+  Write-Host ""
+  Write-Host "  [Y] map on $($Candidate.Label)   [N] pick another key   [Esc] cancel"
+
+  $answer = Read-Answer -Question '  Confirm? (Y/n): '
+  return $answer
+}
+
+function Show-KeyConflict {
+  param([string]$Token)
+
+  $conflicts = @(Find-KeyConflict -Token $Token)
+
+  if ($conflicts.Count -eq 0) {
+    return
+  }
+
+  Write-Host ""
+  Write-Host "  Heads up: this key is already in use in input.ini:"
+
+  foreach ($conflict in $conflicts) {
+    Write-Host "    $($conflict.Trim())"
+  }
+}
+
+function Find-KeyConflict {
+  param([string]$Token)
+
+  $iniPath = Join-Path $configDirectory 'input.ini'
+
+  if (-not (Test-Path -LiteralPath $iniPath)) {
+    $noFile = @()
+    return $noFile
+  }
+
+  # why: the three combo keys receive the new key on purpose, so showing up in them
+  # is no conflict. Without this exclusion the warning would fire against the script
+  $comboKeys = @('evtCameraSnap', 'evtShowCharacterMenu', 'evtChampionOnly')
+  $lines = @(Get-Content -LiteralPath $iniPath)
+  $conflicts = @($lines | Where-Object { Test-TokenInLine -Line $_ -Token $Token -ComboKeys $comboKeys })
+
+  return $conflicts
+}
+
+function Test-TokenInLine {
+  param([string]$Line, [string]$Token, [string[]]$ComboKeys)
+
+  $separatorIndex = $Line.IndexOf('=')
+
+  if ($separatorIndex -lt 1) {
+    $isNotAssignment = $false
+    return $isNotAssignment
+  }
+
+  $keyName = $Line.Substring(0, $separatorIndex).Trim()
+
+  if ($ComboKeys -contains $keyName) {
+    $isOwnedByCombo = $false
+    return $isOwnedByCombo
+  }
+
+  # why: LoL separates keys with a comma inside the same setting, so matching the whole
+  # line would give a false positive: [c] would match inside [c],[space]
+  $boundTokens = @($Line.Substring($separatorIndex + 1).Split(',') | ForEach-Object { $_.Trim() })
+  $hasToken = $boundTokens -contains $Token
+  return $hasToken
+}
+
+# why: a single key press on every question, and Esc cancels on any of them. With
+# Read-Host each question would demand Enter and none would see Esc, so the way to give
+# up would change from screen to screen
+function Read-Answer {
+  param([string]$Question)
+
+  Write-Host -NoNewline $Question
+
+  $answer = $null
+  while ($null -eq $answer) {
+    $pressed = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+    $answer = ConvertTo-Answer -PressedKey $pressed
+  }
+
+  Write-Host $answerEchoes[$answer]
+  return $answer
+}
+
+function ConvertTo-Answer {
+  param($PressedKey)
+
+  if ($PressedKey.VirtualKeyCode -eq $escapeKeyCode) {
+    return $answerCancel
+  }
+
+  # why: Enter means yes, the default announced in the (Y/n) of every question
+  if ($PressedKey.VirtualKeyCode -eq $enterKeyCode) {
+    return $answerYes
+  }
+
+  $character = "$($PressedKey.Character)"
+
+  if ($character -imatch '^y$') {
+    return $answerYes
+  }
+
+  if ($character -imatch '^n$') {
+    return $answerNo
+  }
+
+  # why: a key outside the options decides nothing, so the question stays open
+  $ignored = $null
+  return $ignored
+}
+
 function Invoke-TeamfightMode {
-  # why: passo unico e deliberado, garante que todo .bak seja a copia pre-alteracao,
-  # sem estado intermediario para o usuario decifrar ao voltar atras
-  $orderedPresets = @($hotkeyPresets.zoom, $hotkeyPresets.camera, $hotkeyPresets.range)
+  param([string]$TriggerKey = '[space]', [string]$TriggerLabel = 'Space')
+
+  # why: single step on purpose, so every .bak is the copy from before any change,
+  # with no intermediate state for the user to decode when rolling back
+  $presets = Get-HotkeyPresets -TriggerKey $TriggerKey -TriggerLabel $TriggerLabel
+  $orderedPresets = @($presets.zoom, $presets.camera, $presets.range)
   $persistedPath = Join-Path $configDirectory 'PersistedSettings.json'
 
   Backup-ConfigFile -Path $persistedPath
@@ -450,8 +821,8 @@ function Invoke-Preset {
   }
 }
 
-# why: nem toda chave mora nos dois arquivos. O destino que o preset nao declara
-# e pulado, senao a chave seria criada no arquivo errado e o cliente a ignoraria
+# why: not every setting lives in both files. A target the preset does not declare is
+# skipped, otherwise the setting would land in the wrong file and the client ignores it
 function Write-IniTarget {
   param([hashtable]$Setting)
 
@@ -509,6 +880,11 @@ if ($action -eq 'detect') {
 
 if ($action -eq 'restore') {
   Invoke-Restore
+  exit 0
+}
+
+if ($action -eq 'advanced') {
+  Invoke-AdvancedMode
   exit 0
 }
 

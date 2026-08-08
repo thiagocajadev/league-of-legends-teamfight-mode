@@ -5,6 +5,23 @@ Todas as mudanças relevantes deste projeto são registradas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 e o versionamento segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [2.2.0] - 2026-08-08
+
+### Added
+
+- **Opção `3` Avançado nos dois `.bat`**, que troca o `Espaço` por outra tecla antes de aplicar o Modo Teamfight. A tecla escolhida entra em `evtCameraSnap`, `evtShowCharacterMenu` e `evtChampionOnly`; `RollerButtonSpeed`, `CameraMode` e `TargetChampionsOnlyAsToggle` não dependem de tecla e ficam iguais. A opção `1` não mudou de comportamento.
+- Captura da tecla por `RawUI.ReadKey`, um toque em vez de digitar nome. Aceita letra, número, `F1` a `F12`, espaço, tab e botão extra de mouse, entre `4` e `9`, gravado como `[Button 4]` com `B` maiúsculo. Esquerdo, direito e scroll ficam fora porque o jogo já usa os três.
+- Recusa de `C` e `N`, que são as modificadoras do combo. Escolher uma delas geraria `evtShowCharacterMenu=[c],[c]` e o par colapsaria numa tecla só.
+- Varredura de conflito no `input.ini` antes de gravar. O assistente lista todo `evt*` que já usa a tecla escolhida, dentro da própria confirmação, e a decisão fica com o jogador.
+- Bloco recolhível da opção `3` nos dois READMEs, com a transcrição do assistente, tabela de etapas e a nota de que a grafia acima de `[Button 5]` ainda não foi conferida contra arquivo real.
+
+### Changed
+
+- `$hotkeyPresets` virou `Get-HotkeyPresets -TriggerKey -TriggerLabel`, e `Invoke-TeamfightMode` recebeu os mesmos parâmetros com default `[space]` e `Espaco`. A opção `1` passou a chamar o caminho parametrizado com o default, gravando exatamente os mesmos valores da v2.1.0.
+- Perguntas do assistente respondem a uma tecla só, com `Enter` valendo sim e `Esc` cancelando em qualquer uma delas. Aviso de conflito e confirmação viraram uma pergunta só, porque as duas decidiam a mesma coisa.
+- Comentários do `apply-teamfight-mode.bat` passaram para o inglês. O `diff` entre os dois `.bat` deixou de acusar apenas linha de string e passa a acusar comentário também.
+- Descrição da opção `1` no menu quebrada em duas frases: `zoom travado. Alcance, camera e alvo no Espaco`.
+
 ## [2.1.0] - 2026-07-20
 
 ### Added

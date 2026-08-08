@@ -1,5 +1,5 @@
 @echo off
-:: league-of-legends-teamfight-mode - v2.1.0
+:: league-of-legends-teamfight-mode - v2.2.0
 :: @thiagocajadev
 :: github.com/thiagocajadev/league-of-legends-teamfight-mode
 setlocal EnableExtensions EnableDelayedExpansion
@@ -38,15 +38,16 @@ if not exist "%LOL_CONFIG_DIR%" (
 :menu
 cls
 echo.
-echo   league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
+echo   league-of-legends-teamfight-mode  v2.2.0  @thiagocajadev
 echo   --------------------------------------------------------
 echo   Config: %LOL_CONFIG_DIR%
 echo.
 echo   [1] Aplicar o Modo Teamfight
-echo       zoom travado e alcance, camera e alvo no Espaco
+echo       zoom travado. Alcance, camera e alvo no Espaco
 echo       menos misclick, mais leitura de luta
 echo.
 echo   [2] Restaurar os arquivos originais (.bak)
+echo   [3] Avancado: trocar o Espaco por outra tecla
 echo   [0] Sair
 echo.
 set "MENU_CHOICE="
@@ -58,6 +59,10 @@ if "%MENU_CHOICE%"=="1" (
 )
 if "%MENU_CHOICE%"=="2" (
   set "HOTKEY_ACTION=restore"
+  goto engine
+)
+if "%MENU_CHOICE%"=="3" (
+  set "HOTKEY_ACTION=advanced"
   goto engine
 )
 if "%MENU_CHOICE%"=="0" exit /b 0
@@ -85,69 +90,96 @@ $ErrorActionPreference = 'Stop'
 $configDirectory = $env:LOL_CONFIG_DIR
 $action = $env:HOTKEY_ACTION
 
+# why: para tecla sem impressao o RawUI.ReadKey entrega codigo de tecla virtual do
+# Windows, e nao caractere. Nomeados aqui porque o numero solto no if nao diz nada
+$escapeKeyCode = 27
+$enterKeyCode = 13
+$mouseMenuKeyCode = 77
+$spaceKeyCode = 32
+$tabKeyCode = 9
+$firstFunctionKeyCode = 112
+$lastFunctionKeyCode = 123
+
+# why: as perguntas tem tres saidas, nao duas. O "nao" segue para outro caminho util,
+# e so o Esc desiste, entao um booleano nao daria conta
+$answerYes = 'yes'
+$answerNo = 'no'
+$answerCancel = 'cancel'
+$answerEchoes = @{ yes = 'S'; no = 'N'; cancel = 'cancelado' }
+
+# why: o jogo reserva esquerdo, direito e scroll para mover, atacar e dar zoom. A faixa
+# comeca no 4 e vai ate o 9 para atender mouse com mais de dois botoes extras
+$extraMouseButtonPattern = '^[4-9]$'
+
 # why: a Riot grava o mesmo arquivo como "Input.ini" e "input.ini" conforme a versao,
 # entao o nome do disco e o nome dentro do JSON sao declarados separados
-$hotkeyPresets = @{
-  zoom = @{
-    Label    = 'Zoom via scroll desabilitado'
-    Settings = @(
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'MouseSettings'
-        Key           = 'RollerButtonSpeed'
-        Value         = '0'
-      }
-    )
+function Get-HotkeyPresets {
+  param([string]$TriggerKey = '[space]', [string]$TriggerLabel = 'Espaco')
+
+  $presets = @{
+    zoom = @{
+      Label    = 'Zoom via scroll desabilitado'
+      Settings = @(
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'MouseSettings'
+          Key           = 'RollerButtonSpeed'
+          Value         = '0'
+        }
+      )
+    }
+    # why: o combo pressupoe camera solta. Com CameraMode=1 ela ja fica travada
+    # e a tecla do combo nao tem o que fixar, entao o gesto inteiro perde efeito.
+    camera = @{
+      Label    = "Camera solta com trava no $TriggerLabel"
+      Settings = @(
+        @{
+          IniFile = 'input.ini'
+          Section = 'GameEvents'
+          Key     = 'evtCameraSnap'
+          Value   = $TriggerKey
+        },
+        @{
+          PersistedFile = 'Game.cfg'
+          Section       = 'General'
+          Key           = 'CameraMode'
+          Value         = '0'
+        }
+      )
+    }
+    # why: as tres chaves so funcionam juntas. A tecla repetida amarra alcance,
+    # camera e alvo no mesmo gesto, e o AsToggle=0 faz valer enquanto segura.
+    # Em 1 viraria liga/desliga e a combinacao quebra.
+    range = @{
+      Label    = 'Alcance de ataque, fixar camera e alvejar campeoes'
+      Settings = @(
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'GameEvents'
+          Key           = 'evtShowCharacterMenu'
+          Value         = "[c],$TriggerKey"
+        },
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'GameEvents'
+          Key           = 'evtChampionOnly'
+          Value         = "[n],$TriggerKey"
+        },
+        @{
+          IniFile       = 'input.ini'
+          PersistedFile = 'Input.ini'
+          Section       = 'GameEvents'
+          Key           = 'TargetChampionsOnlyAsToggle'
+          Value         = '0'
+        }
+      )
+    }
   }
-  # why: o combo pressupoe camera solta. Com CameraMode=1 ela ja fica travada
-  # e o [space] nao tem o que fixar, entao o gesto inteiro perde efeito.
-  camera = @{
-    Label    = 'Camera solta com trava no Espaco'
-    Settings = @(
-      @{
-        IniFile = 'input.ini'
-        Section = 'GameEvents'
-        Key     = 'evtCameraSnap'
-        Value   = '[space]'
-      },
-      @{
-        PersistedFile = 'Game.cfg'
-        Section       = 'General'
-        Key           = 'CameraMode'
-        Value         = '0'
-      }
-    )
-  }
-  # why: as tres chaves so funcionam juntas. O [space] repetido amarra alcance,
-  # camera e alvo no mesmo gesto, e o AsToggle=0 faz valer enquanto segura.
-  # Em 1 viraria liga/desliga e a combinacao quebra.
-  range = @{
-    Label    = 'Alcance de ataque, fixar camera e alvejar campeoes'
-    Settings = @(
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'GameEvents'
-        Key           = 'evtShowCharacterMenu'
-        Value         = '[c],[space]'
-      },
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'GameEvents'
-        Key           = 'evtChampionOnly'
-        Value         = '[n],[space]'
-      },
-      @{
-        IniFile       = 'input.ini'
-        PersistedFile = 'Input.ini'
-        Section       = 'GameEvents'
-        Key           = 'TargetChampionsOnlyAsToggle'
-        Value         = '0'
-      }
-    )
-  }
+
+  return $presets
 }
 
 function Find-LeagueDirectory {
@@ -423,10 +455,349 @@ function Set-NamedProperty {
   $Target.$Name = $Value
 }
 
+function Invoke-AdvancedMode {
+  Write-Host "  Modo Avancado"
+  Write-Host "  ------------------------------------------------"
+  Write-Host "  O Modo Teamfight usa o Espaco como tecla do combo."
+  Write-Host ""
+  Write-Host "  Fora da lista: C e N, ja usadas no combo, M abre o mouse e Esc cancela."
+  Write-Host "  Vale letra, numero, F1 a F12, espaco, tab ou botao extra de mouse."
+  Write-Host ""
+
+  $wantsSwap = Read-Answer -Question '  Trocar o Espaco por outra tecla? (S/n): '
+
+  if ($wantsSwap -eq $answerCancel) {
+    Show-CancelNotice
+    return
+  }
+
+  if ($wantsSwap -eq $answerNo) {
+    Write-Host ""
+    Invoke-TeamfightMode
+    return
+  }
+
+  $trigger = Read-TriggerUntilConfirmed
+
+  if ($null -eq $trigger) {
+    Show-CancelNotice
+    return
+  }
+
+  Write-Host ""
+  Invoke-TeamfightMode -TriggerKey $trigger.Token -TriggerLabel $trigger.Label
+}
+
+function Show-CancelNotice {
+  Write-Host ""
+  Write-Host "Cancelado. Nada foi alterado."
+}
+
+function Read-TriggerUntilConfirmed {
+  # why: a escolha repete ate confirmar, e nada e escrito antes disso. Assim uma tecla
+  # errada nunca vira alteracao de arquivo, que a opcao 2 teria de desfazer depois
+  while ($true) {
+    $candidate = Read-TriggerCandidate
+
+    if ($null -eq $candidate) {
+      $canceled = $null
+      return $canceled
+    }
+
+    $answer = Confirm-Trigger -Candidate $candidate
+
+    if ($answer -eq $answerCancel) {
+      $abandoned = $null
+      return $abandoned
+    }
+
+    if ($answer -eq $answerYes) {
+      return $candidate
+    }
+  }
+}
+
+function Read-TriggerCandidate {
+  # why: tecla fora da lista so repete a pergunta, e o Esc e a unica saida. Sem isso
+  # errar a tecla encerraria o assistente, confundindo "escolhi errado" com "desisti"
+  while ($true) {
+    $pressed = Read-PressedTriggerKey
+
+    if ($pressed.VirtualKeyCode -eq $escapeKeyCode) {
+      $canceled = $null
+      return $canceled
+    }
+
+    $token = Read-TokenFromKey -PressedKey $pressed
+    $candidate = New-TriggerCandidate -Token $token
+
+    if ($null -ne $candidate) {
+      return $candidate
+    }
+  }
+}
+
+function Read-PressedTriggerKey {
+  Write-Host ""
+  Write-Host "  Pressione a tecla desejada."
+  Write-Host "  [M] abre os botoes de mouse, [Esc] cancela."
+  Write-Host ""
+  Write-Host -NoNewline "  Tecla: "
+
+  $pressed = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+  return $pressed
+}
+
+function Read-TokenFromKey {
+  param($PressedKey)
+
+  if ($PressedKey.VirtualKeyCode -eq $mouseMenuKeyCode) {
+    Write-Host "M"
+    $mouseToken = Read-MouseButton
+    return $mouseToken
+  }
+
+  $keyboardToken = ConvertTo-HotkeyToken -PressedKey $PressedKey
+  return $keyboardToken
+}
+
+function New-TriggerCandidate {
+  param([string]$Token)
+
+  if ([string]::IsNullOrWhiteSpace($Token)) {
+    Write-Host ""
+    Write-Host "  Tecla nao suportada. Vale letra, numero, F1 a F12, espaco, tab ou mouse."
+    $unsupported = $null
+    return $unsupported
+  }
+
+  if (Test-ReservedToken -Token $Token) {
+    Write-Host ""
+    Write-Host "  $Token ja e tecla do proprio combo. O par colapsaria numa tecla so."
+    $reserved = $null
+    return $reserved
+  }
+
+  # why: o ReadKey usa NoEcho, entao sem esse Write-Host a linha do prompt fica aberta
+  # e a pergunta seguinte sai grudada nela
+  $label = ConvertTo-KeyLabel -Token $Token
+  Write-Host $label
+
+  $candidate = [pscustomobject]@{ Token = $Token; Label = $label }
+  return $candidate
+}
+
+# why: allowlist estreita de proposito. A grafia dos tokens do LoL so e conhecida com
+# certeza para letra, digito, F1-F12, espaco e tab. Aceitar o resto gravaria um bind
+# que o jogo ignora em silencio, e o usuario culparia o script
+function ConvertTo-HotkeyToken {
+  param($PressedKey)
+
+  $virtualKey = $PressedKey.VirtualKeyCode
+
+  if ($virtualKey -ge $firstFunctionKeyCode -and $virtualKey -le $lastFunctionKeyCode) {
+    $functionKey = "[f$($virtualKey - $firstFunctionKeyCode + 1)]"
+    return $functionKey
+  }
+
+  if ($virtualKey -eq $spaceKeyCode) {
+    $spaceKey = '[space]'
+    return $spaceKey
+  }
+
+  if ($virtualKey -eq $tabKeyCode) {
+    $tabKey = '[tab]'
+    return $tabKey
+  }
+
+  $character = "$($PressedKey.Character)"
+
+  if ($character -match '^[a-zA-Z0-9]$') {
+    $printableKey = "[$($character.ToLower())]"
+    return $printableKey
+  }
+
+  $unsupported = $null
+  return $unsupported
+}
+
+function Read-MouseButton {
+  Write-Host ""
+  Write-Host "  Esquerdo, direito e scroll ficam fora: o jogo ja usa os tres."
+  Write-Host "  Escolha o botao extra, entre 4 e 9. Mouse comum tem 4 e 5."
+  Write-Host ""
+  Write-Host -NoNewline "  Botao: "
+
+  $pressed = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+  $chosen = "$($pressed.Character)"
+  Write-Host $chosen
+
+  if ($chosen -notmatch $extraMouseButtonPattern) {
+    $invalid = $null
+    return $invalid
+  }
+
+  # why: o LoL grava botao de mouse com B maiusculo, "[Button 4]", diferente das teclas
+  # de teclado, que ficam minusculas. Nao e descuido de grafia, e o formato do arquivo
+  $buttonToken = "[Button $chosen]"
+  return $buttonToken
+}
+
+function Test-ReservedToken {
+  param([string]$Token)
+
+  # why: [c] e [n] ja sao as modificadoras do combo. Escolher uma delas geraria
+  # evtShowCharacterMenu=[c],[c], e um par de teclas iguais vira uma tecla so
+  $reservedTokens = @('[c]', '[n]')
+  $isReserved = $reservedTokens -contains $Token
+  return $isReserved
+}
+
+function ConvertTo-KeyLabel {
+  param([string]$Token)
+
+  $bareName = $Token.Trim('[', ']')
+
+  if ($bareName -eq 'space') {
+    $spaceLabel = 'Espaco'
+    return $spaceLabel
+  }
+
+  if ($bareName -like 'Button *') {
+    $buttonLabel = "Botao $($bareName.Split(' ')[-1]) do mouse"
+    return $buttonLabel
+  }
+
+  $upperLabel = $bareName.ToUpper()
+  return $upperLabel
+}
+
+function Confirm-Trigger {
+  param($Candidate)
+
+  # why: o conflito entra na propria confirmacao. Perguntar "usa mesmo assim" e depois
+  # "confirma" seriam duas perguntas para a mesma decisao
+  Show-KeyConflict -Token $Candidate.Token
+
+  Write-Host ""
+  Write-Host "  [S] mapear no $($Candidate.Label)   [N] escolher outra tecla   [Esc] cancelar"
+
+  $answer = Read-Answer -Question '  Confirma? (S/n): '
+  return $answer
+}
+
+function Show-KeyConflict {
+  param([string]$Token)
+
+  $conflicts = @(Find-KeyConflict -Token $Token)
+
+  if ($conflicts.Count -eq 0) {
+    return
+  }
+
+  Write-Host ""
+  Write-Host "  Atencao: essa tecla ja esta em uso no input.ini:"
+
+  foreach ($conflict in $conflicts) {
+    Write-Host "    $($conflict.Trim())"
+  }
+}
+
+function Find-KeyConflict {
+  param([string]$Token)
+
+  $iniPath = Join-Path $configDirectory 'input.ini'
+
+  if (-not (Test-Path -LiteralPath $iniPath)) {
+    $noFile = @()
+    return $noFile
+  }
+
+  # why: as tres chaves do combo recebem a tecla nova de proposito, entao aparecer
+  # nelas nao e conflito. Sem essa exclusao o aviso dispararia contra o proprio script
+  $comboKeys = @('evtCameraSnap', 'evtShowCharacterMenu', 'evtChampionOnly')
+  $lines = @(Get-Content -LiteralPath $iniPath)
+  $conflicts = @($lines | Where-Object { Test-TokenInLine -Line $_ -Token $Token -ComboKeys $comboKeys })
+
+  return $conflicts
+}
+
+function Test-TokenInLine {
+  param([string]$Line, [string]$Token, [string[]]$ComboKeys)
+
+  $separatorIndex = $Line.IndexOf('=')
+
+  if ($separatorIndex -lt 1) {
+    $isNotAssignment = $false
+    return $isNotAssignment
+  }
+
+  $keyName = $Line.Substring(0, $separatorIndex).Trim()
+
+  if ($ComboKeys -contains $keyName) {
+    $isOwnedByCombo = $false
+    return $isOwnedByCombo
+  }
+
+  # why: o LoL separa teclas por virgula na mesma chave, entao comparar a linha inteira
+  # daria falso positivo: [c] casaria dentro de [c],[space]
+  $boundTokens = @($Line.Substring($separatorIndex + 1).Split(',') | ForEach-Object { $_.Trim() })
+  $hasToken = $boundTokens -contains $Token
+  return $hasToken
+}
+
+# why: uma tecla so em toda pergunta, e o Esc cancela em qualquer uma delas. Com
+# Read-Host cada pergunta exigiria Enter e nenhuma enxergaria o Esc, entao a forma de
+# desistir mudaria de tela para tela
+function Read-Answer {
+  param([string]$Question)
+
+  Write-Host -NoNewline $Question
+
+  $answer = $null
+  while ($null -eq $answer) {
+    $pressed = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+    $answer = ConvertTo-Answer -PressedKey $pressed
+  }
+
+  Write-Host $answerEchoes[$answer]
+  return $answer
+}
+
+function ConvertTo-Answer {
+  param($PressedKey)
+
+  if ($PressedKey.VirtualKeyCode -eq $escapeKeyCode) {
+    return $answerCancel
+  }
+
+  # why: Enter vale sim, que e o padrao anunciado no (S/n) de cada pergunta
+  if ($PressedKey.VirtualKeyCode -eq $enterKeyCode) {
+    return $answerYes
+  }
+
+  $character = "$($PressedKey.Character)"
+
+  if ($character -imatch '^[sy]$') {
+    return $answerYes
+  }
+
+  if ($character -imatch '^n$') {
+    return $answerNo
+  }
+
+  # why: tecla fora das opcoes nao decide nada, entao a pergunta fica aberta
+  $ignored = $null
+  return $ignored
+}
+
 function Invoke-TeamfightMode {
+  param([string]$TriggerKey = '[space]', [string]$TriggerLabel = 'Espaco')
+
   # why: passo unico e deliberado, garante que todo .bak seja a copia pre-alteracao,
   # sem estado intermediario para o usuario decifrar ao voltar atras
-  $orderedPresets = @($hotkeyPresets.zoom, $hotkeyPresets.camera, $hotkeyPresets.range)
+  $presets = Get-HotkeyPresets -TriggerKey $TriggerKey -TriggerLabel $TriggerLabel
+  $orderedPresets = @($presets.zoom, $presets.camera, $presets.range)
   $persistedPath = Join-Path $configDirectory 'PersistedSettings.json'
 
   Backup-ConfigFile -Path $persistedPath
@@ -509,6 +880,11 @@ if ($action -eq 'detect') {
 
 if ($action -eq 'restore') {
   Invoke-Restore
+  exit 0
+}
+
+if ($action -eq 'advanced') {
+  Invoke-AdvancedMode
   exit 0
 }
 

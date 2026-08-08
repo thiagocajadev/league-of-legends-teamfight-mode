@@ -128,15 +128,16 @@ Clique no link, salve o arquivo e dê dois cliques nele. A opção `1`, **Aplica
 Abre um menu:
 
 ```text
-  league-of-legends-teamfight-mode  v2.1.0  @thiagocajadev
+  league-of-legends-teamfight-mode  v2.2.0  @thiagocajadev
   --------------------------------------------------------
   Config: C:\Riot Games\League of Legends\Config
 
   [1] Aplicar o Modo Teamfight
-      zoom travado e alcance, camera e alvo no Espaco
+      zoom travado. Alcance, camera e alvo no Espaco
       menos misclick, mais leitura de luta
 
   [2] Restaurar os arquivos originais (.bak)
+  [3] Avancado: trocar o Espaco por outra tecla
   [0] Sair
 ```
 
@@ -144,6 +145,7 @@ Abre um menu:
 | :-- | :-- |
 | `1` | `RollerButtonSpeed=0`, as duas chaves de câmera solta e as três de alcance e alvo |
 | `2` | Devolve todo `.bak` da pasta `Config` ao lugar de origem |
+| `3` | O mesmo que a `1`, com a tecla do combo escolhida por você |
 
 - **Um passo só, de propósito.** As configurações são aplicadas na mesma execução. Assim todo `.bak` é sempre a cópia anterior a qualquer alteração, e não existe estado intermediário para você decifrar se resolver voltar atrás.
 - **Backup automático.** Na primeira vez que você roda `1`, cada arquivo tocado ganha um `.bak` ao lado. Rodar de novo não sobrescreve esse backup, senão a cópia "original" viraria cópia do arquivo já modificado.
@@ -152,6 +154,53 @@ Abre um menu:
 - **Acha a instalação sozinho.** Com o jogo aberto, o `.bat` lê o caminho do processo em execução, então funciona com o League instalado em qualquer disco ou pasta. Se o jogo estiver fechado, ele tenta o registro da Riot, depois o caminho padrão, e só então pergunta.
 
 Se a pasta `Config` não existir, ele avisa e sai sem escrever nada.
+
+</details>
+
+<details>
+<summary><b>Se preferir tecla diferente do <code>Espaço</code>, escolha a opção <code>3</code> Avançado</b></summary>
+<br>
+
+O `Espaço` é a escolha padrão porque fica embaixo do polegar e não disputa espaço com as habilidades. Se ele já estiver ocupado no seu setup, a opção `3` monta o mesmo Modo Teamfight em outra tecla.
+
+O assistente pergunta antes de escrever, e cada resposta é uma tecla só:
+
+```text
+  Modo Avancado
+  ------------------------------------------------
+  O Modo Teamfight usa o Espaco como tecla do combo.
+
+  Fora da lista: C e N, ja usadas no combo, M abre o mouse e Esc cancela.
+  Vale letra, numero, F1 a F12, espaco, tab ou botao extra de mouse.
+
+  Trocar o Espaco por outra tecla? (S/n): S
+
+  Pressione a tecla desejada.
+  [M] abre os botoes de mouse, [Esc] cancela.
+
+  Tecla: V
+
+  Atencao: essa tecla ja esta em uso no input.ini:
+    evtCastAvatarSpell1=[v]
+
+  [S] mapear no V   [N] escolher outra tecla   [Esc] cancelar
+  Confirma? (S/n): S
+```
+
+Responder `N` na primeira pergunta aplica o Modo Teamfight no `Espaço`, igual à opção `1`.
+
+| Etapa | O que acontece |
+| :-- | :-- |
+| Escolha da tecla | Um toque, sem digitar nome. Vale letra, número, `F1` a `F12`, espaço, tab ou botão de mouse |
+| Teclas recusadas | `C` e `N` são as modificadoras do combo, e juntariam o par numa tecla só. `M` abre o menu de mouse e `Esc` cancela, então também ficam de fora |
+| Botões de mouse | Só os extras, entre `4` e `9`. Esquerdo, direito e scroll ficam fora porque o jogo já usa os três |
+| Tecla fora da lista | O assistente avisa e pede de novo. Errar a tecla não encerra nada |
+| Confirmação | O aviso de conflito vem junto dela. `S` aplica, `N` volta para a escolha da tecla, `Esc` sai sem escrever, e `Enter` vale `S` |
+
+A tecla escolhida entra nas três chaves do combo: `evtCameraSnap`, `evtShowCharacterMenu` e `evtChampionOnly`. O `RollerButtonSpeed`, o `CameraMode` e o `TargetChampionsOnlyAsToggle` não dependem de tecla e ficam iguais aos da opção `1`.
+
+> [!NOTE]
+> Botão de mouse é gravado como `[Button 4]` até `[Button 9]`. Se o bind não pegar no jogo, use a opção `2` para restaurar e escolha uma tecla do teclado.
 
 </details>
 
